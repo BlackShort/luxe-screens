@@ -19,7 +19,7 @@ import type { Theater } from "@/types";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
+import { SiteLayout } from "@/components/site/layout/site-layout";
 type SortKey =
   | "recommended"
   | "price-asc"
@@ -93,323 +93,324 @@ export default function GalleryPage() {
   }
 
   return (
-    <div className="py-12 px-16">
-      {/* Header */}
-      <div className="mb-10">
-        <p className="mb-2 text-sm font-medium text-primary">
-          Gallery
-        </p>
+    <SiteLayout>
+      <div className="py-12 px-6 max-w-6xl mx-auto">
 
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-          Every room, at a glance
-        </h1>
+        {/* Header */}
+        <div className="mb-10">
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+            Every room, at a glance
+          </h1>
 
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          Explore our available rooms, compare amenities, and find
-          the right space for your next screening.
-        </p>
-      </div>
-
-      {/* Filters */}
-      <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-        {/* Search */}
-        <div className="relative flex-1">
-          <Search
-            size={16}
-            aria-hidden="true"
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-          />
-
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search rooms, cities, amenities…"
-            aria-label="Search rooms"
-            className="pl-9"
-          />
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+            Explore our available rooms, compare amenities, and find
+            the right space for your next screening.
+          </p>
         </div>
 
-        {/* City */}
-        <select
-          value={cityFilter}
-          onChange={(event) => setCityFilter(event.target.value)}
-          aria-label="Filter by city"
-          className={cn(
-            "h-9 rounded-md border border-input bg-background px-3",
-            "text-sm text-foreground shadow-xs",
-            "outline-none transition-colors",
-            "focus:border-ring focus:ring-3 focus:ring-ring/50",
-            "disabled:cursor-not-allowed disabled:opacity-50"
-          )}
-        >
-          <option value="All">All cities</option>
+        {/* Filters */}
+        <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          {/* Search */}
+          <div className="relative flex-1 max-w-md">
+            <Search
+              size={16}
+              aria-hidden="true"
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            />
 
-          {cities.map((city) => (
-            <option key={city.name} value={city.name}>
-              {city.name}
-            </option>
-          ))}
-        </select>
+            <Input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search rooms, cities, amenities…"
+              aria-label="Search rooms"
+              className="pl-9 h-9"
+            />
+          </div>
 
-        {/* Sort */}
-        <select
-          value={sort}
-          onChange={(event) =>
-            setSort(event.target.value as SortKey)
-          }
-          aria-label="Sort rooms"
-          className={cn(
-            "h-9 rounded-md border border-input bg-background px-3",
-            "text-sm text-foreground shadow-xs",
-            "outline-none transition-colors",
-            "focus:border-ring focus:ring-3 focus:ring-ring/50",
-            "disabled:cursor-not-allowed disabled:opacity-50"
-          )}
-        >
-          <option value="recommended">Recommended</option>
-          <option value="price-asc">
-            Price: Low to High
-          </option>
-          <option value="price-desc">
-            Price: High to Low
-          </option>
-          <option value="rating">Top Rated</option>
-        </select>
-      </div>
-
-      {/* Results count */}
-      {loading ? (
-        <p className="mb-6 text-xs text-muted-foreground">Loading rooms…</p>
-      ) : (
-        <p className="mb-6 text-xs text-muted-foreground">
-          {results.length}{" "}
-          {results.length === 1 ? "room" : "rooms"} found
-        </p>
-      )}
-
-      {/* Gallery */}
-      {loading ? (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="aspect-4/3 animate-pulse rounded-lg border border-border bg-muted" />
-          ))}
-        </div>
-      ) : results.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {results.map((room) => (
-            <button
-              key={room.id}
-              type="button"
-              onClick={() => openLightbox(room)}
+          <div className="flex items-center justify-between gap-3">
+            {/* City */}
+            <select
+              value={cityFilter}
+              onChange={(event) => setCityFilter(event.target.value)}
+              aria-label="Filter by city"
               className={cn(
-                "group w-full text-left",
-                "rounded-lg outline-none",
-                "focus-visible:ring-3 focus-visible:ring-ring/50"
+                "h-9 rounded-md border border-input bg-background px-3",
+                "text-sm text-foreground shadow-xs",
+                "outline-none transition-colors",
+                "focus:border-ring focus:ring-3 focus:ring-ring/50",
+                "disabled:cursor-not-allowed disabled:opacity-50"
               )}
             >
-              {/* Image */}
-              <div
+              <option value="All">All cities</option>
+
+              {cities.map((city) => (
+                <option key={city.name} value={city.name}>
+                  {city.name}
+                </option>
+              ))}
+            </select>
+
+            {/* Sort */}
+            <select
+              value={sort}
+              onChange={(event) =>
+                setSort(event.target.value as SortKey)
+              }
+              aria-label="Sort rooms"
+              className={cn(
+                "h-9 rounded-md border border-input bg-background px-3",
+                "text-sm text-foreground shadow-xs",
+                "outline-none transition-colors",
+                "focus:border-ring focus:ring-3 focus:ring-ring/50",
+                "disabled:cursor-not-allowed disabled:opacity-50"
+              )}
+            >
+              <option value="recommended">Recommended</option>
+              <option value="price-asc">
+                Price: Low to High
+              </option>
+              <option value="price-desc">
+                Price: High to Low
+              </option>
+              <option value="rating">Top Rated</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Results count */}
+        {loading ? (
+          <p className="mb-6 text-xs text-muted-foreground">Loading rooms…</p>
+        ) : (
+          <p className="mb-6 text-xs text-muted-foreground">
+            {results.length}{" "}
+            {results.length === 1 ? "room" : "rooms"} found
+          </p>
+        )}
+
+        {/* Gallery */}
+        {loading ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="aspect-4/3 animate-pulse rounded-lg border border-border bg-muted" />
+            ))}
+          </div>
+        ) : results.length > 0 ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {results.map((room) => (
+              <button
+                key={room.id}
+                type="button"
+                onClick={() => openLightbox(room)}
                 className={cn(
-                  "relative aspect-4/3 overflow-hidden rounded-lg",
-                  "border border-border bg-muted"
+                  "group w-full text-left",
+                  "rounded-lg outline-none",
+                  "focus-visible:ring-3 focus-visible:ring-ring/50"
                 )}
               >
-                <Image
-                  src={room.images[0] ?? ""}
-                  alt={room.name}
-                  fill
-                  sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-
-                {/* Image overlay */}
+                {/* Image */}
                 <div
                   className={cn(
-                    "absolute inset-0 bg-foreground/0",
-                    "transition-colors duration-300",
-                    "group-hover:bg-foreground/5"
+                    "relative aspect-4/3 overflow-hidden rounded-lg",
+                    "border border-border bg-muted"
                   )}
-                />
-              </div>
+                >
+                  <Image
+                    src={room.images[0] ?? ""}
+                    alt={room.name}
+                    fill
+                    sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
 
-              {/* Room details */}
-              <div className="mt-3 flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-foreground">
-                    {room.name}
-                  </p>
+                  {/* Image overlay */}
+                  <div
+                    className={cn(
+                      "absolute inset-0 bg-foreground/0",
+                      "transition-colors duration-300",
+                      "group-hover:bg-foreground/5"
+                    )}
+                  />
+                </div>
 
-                  <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                    <MapPin
-                      size={11}
-                      aria-hidden="true"
-                    />
-                    {room.city}
+                {/* Room details */}
+                <div className="mt-3 flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-foreground">
+                      {room.name}
+                    </p>
+
+                    <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                      <MapPin
+                        size={11}
+                        aria-hidden="true"
+                      />
+                      {room.city}
+                    </p>
+                  </div>
+
+                  <p className="shrink-0 text-sm font-medium text-primary">
+                    {formatCurrency(room.basePrice)}
                   </p>
                 </div>
 
-                <p className="shrink-0 text-sm font-medium text-primary">
-                  {formatCurrency(room.basePrice)}
-                </p>
-              </div>
+                {/* Meta */}
+                <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <Star
+                      size={11}
+                      aria-hidden="true"
+                      className="text-primary"
+                      fill="currentColor"
+                    />
+                    {room.rating}
+                  </span>
 
-              {/* Meta */}
-              <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Star
-                    size={11}
-                    aria-hidden="true"
-                    className="text-primary"
-                    fill="currentColor"
-                  />
-                  {room.rating}
-                </span>
+                  <span className="flex items-center gap-1">
+                    <Users
+                      size={11}
+                      aria-hidden="true"
+                    />
+                    {room.maxCapacity}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-lg border border-dashed border-border bg-muted/30 px-6 py-16 text-center">
+            <p className="text-sm font-medium text-foreground">
+              No rooms found
+            </p>
 
-                <span className="flex items-center gap-1">
-                  <Users
-                    size={11}
-                    aria-hidden="true"
-                  />
-                  {room.maxCapacity}
-                </span>
-              </div>
-            </button>
-          ))}
-        </div>
-      ) : (
-        <div className="rounded-lg border border-dashed border-border bg-muted/30 px-6 py-16 text-center">
-          <p className="text-sm font-medium text-foreground">
-            No rooms found
-          </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Try a different city or search keyword.
+            </p>
 
-          <p className="mt-1 text-sm text-muted-foreground">
-            Try a different city or search keyword.
-          </p>
+            {(query || cityFilter !== "All") && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-4"
+                onClick={() => {
+                  setQuery("");
+                  setCityFilter("All");
+                }}
+              >
+                Clear filters
+              </Button>
+            )}
+          </div>
+        )}
 
-          {(query || cityFilter !== "All") && (
+        {/* Lightbox */}
+        {lightboxRoom ? (
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${lightboxRoom.name} gallery`}
+            className="fixed inset-0 z-60 flex items-center justify-center bg-foreground/95 p-4 backdrop-blur-sm"
+            onClick={closeLightbox}
+          >
+            {/* Close */}
             <Button
               type="button"
-              variant="outline"
-              size="sm"
-              className="mt-4"
-              onClick={() => {
-                setQuery("");
-                setCityFilter("All");
-              }}
+              variant="ghost"
+              size="icon"
+              aria-label="Close gallery"
+              onClick={closeLightbox}
+              className="absolute right-4 top-4 z-10 text-background hover:bg-background/10 hover:text-background"
             >
-              Clear filters
+              <X size={20} />
             </Button>
-          )}
-        </div>
-      )}
 
-      {/* Lightbox */}
-      {lightboxRoom ? (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={`${lightboxRoom.name} gallery`}
-          className="fixed inset-0 z-60 flex items-center justify-center bg-foreground/95 p-4 backdrop-blur-sm"
-          onClick={closeLightbox}
-        >
-          {/* Close */}
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            aria-label="Close gallery"
-            onClick={closeLightbox}
-            className="absolute right-4 top-4 z-10 text-background hover:bg-background/10 hover:text-background"
-          >
-            <X size={20} />
-          </Button>
+            {/* Content */}
+            <div
+              className="w-full max-w-3xl"
+              onClick={(event) => event.stopPropagation()}
+            >
+              {/* Main image */}
+              <div className="relative aspect-video overflow-hidden rounded-lg border border-border/50 bg-muted">
+                <Image
+                  src={
+                    lightboxRoom.images[lightboxIndex] ?? ""
+                  }
+                  alt={lightboxRoom.name}
+                  fill
+                  sizes="90vw"
+                  className="object-cover"
+                />
 
-          {/* Content */}
-          <div
-            className="w-full max-w-3xl"
-            onClick={(event) => event.stopPropagation()}
-          >
-            {/* Main image */}
-            <div className="relative aspect-video overflow-hidden rounded-lg border border-border/50 bg-muted">
-              <Image
-                src={
-                  lightboxRoom.images[lightboxIndex] ?? ""
-                }
-                alt={lightboxRoom.name}
-                fill
-                sizes="90vw"
-                className="object-cover"
-              />
+                {lightboxRoom.images.length > 1 ? (
+                  <>
+                    {/* Previous */}
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="icon"
+                      aria-label="Previous image"
+                      onClick={() => moveLightbox(-1)}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full shadow-lg"
+                    >
+                      <ChevronLeft size={18} />
+                    </Button>
 
-              {lightboxRoom.images.length > 1 ? (
-                <>
-                  {/* Previous */}
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="icon"
-                    aria-label="Previous image"
-                    onClick={() => moveLightbox(-1)}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full shadow-lg"
-                  >
-                    <ChevronLeft size={18} />
-                  </Button>
+                    {/* Next */}
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="icon"
+                      aria-label="Next image"
+                      onClick={() => moveLightbox(1)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full shadow-lg"
+                    >
+                      <ChevronRight size={18} />
+                    </Button>
+                  </>
+                ) : null}
+              </div>
 
-                  {/* Next */}
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="icon"
-                    aria-label="Next image"
-                    onClick={() => moveLightbox(1)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full shadow-lg"
-                  >
-                    <ChevronRight size={18} />
-                  </Button>
-                </>
-              ) : null}
-            </div>
+              {/* Details */}
+              <div className="mt-4 flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-xl font-semibold tracking-tight text-background">
+                    {lightboxRoom.name}
+                  </h2>
 
-            {/* Details */}
-            <div className="mt-4 flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <h2 className="text-xl font-semibold tracking-tight text-background">
-                  {lightboxRoom.name}
-                </h2>
+                  <p className="mt-1 flex items-center gap-1.5 text-sm text-background/70">
+                    <MapPin size={13} aria-hidden="true" />
+                    {lightboxRoom.address}, {lightboxRoom.city}
+                  </p>
+                </div>
 
-                <p className="mt-1 flex items-center gap-1.5 text-sm text-background/70">
-                  <MapPin size={13} aria-hidden="true" />
-                  {lightboxRoom.address}, {lightboxRoom.city}
+                <p className="text-lg font-semibold text-primary">
+                  {formatCurrency(lightboxRoom.basePrice)}
                 </p>
               </div>
 
-              <p className="text-lg font-semibold text-primary">
-                {formatCurrency(lightboxRoom.basePrice)}
-              </p>
-            </div>
+              {/* Amenities */}
+              <div className="mt-4 flex flex-wrap gap-2">
+                {lightboxRoom.amenities.map((amenity) => (
+                  <span
+                    key={amenity}
+                    className="rounded-full border border-background/20 bg-background/5 px-3 py-1 text-xs text-background/80"
+                  >
+                    {amenity}
+                  </span>
+                ))}
+              </div>
 
-            {/* Amenities */}
-            <div className="mt-4 flex flex-wrap gap-2">
-              {lightboxRoom.amenities.map((amenity) => (
-                <span
-                  key={amenity}
-                  className="rounded-full border border-background/20 bg-background/5 px-3 py-1 text-xs text-background/80"
-                >
-                  {amenity}
-                </span>
-              ))}
+              {/* Image counter */}
+              {lightboxRoom.images.length > 1 ? (
+                <p className="mt-4 text-center text-xs text-background/60">
+                  {lightboxIndex + 1} /{" "}
+                  {lightboxRoom.images.length}
+                </p>
+              ) : null}
             </div>
-
-            {/* Image counter */}
-            {lightboxRoom.images.length > 1 ? (
-              <p className="mt-4 text-center text-xs text-background/60">
-                {lightboxIndex + 1} /{" "}
-                {lightboxRoom.images.length}
-              </p>
-            ) : null}
           </div>
-        </div>
-      ) : null}
-    </div>
+        ) : null}
+      </div>
+    </SiteLayout>
   );
 }

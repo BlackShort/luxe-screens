@@ -9,7 +9,7 @@ export const navigationLinks = [
     { label: "Occasions", href: "#occasions" },
     { label: "Services", href: "#services" },
     { label: "Gallery", href: "#gallery" },
-    { label: "Contact", href: "#contact" },
+    { label: "AI Planner", href: "/ai-planner" },
 ]
 
 export const socialLinks = [

@@ -21,7 +21,7 @@ export function StepLocation({
       title="Select Location"
       description="Pick a city to see the rooms available there."
     >
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {cities.map((item) => {
           const active = city === item.name;
 
@@ -32,23 +32,70 @@ export function StepLocation({
               aria-pressed={active}
               onClick={() => onSelectCity(item.name as Place)}
               className={cn(
-                "group flex items-center justify-around gap-2 rounded-lg border px-4 py-3 text-left text-sm transition-colors",
-                "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
+                "group relative flex min-h-[122px] flex-col items-center justify-center",
+                "rounded-xl border px-3 py-4 text-center text-sm",
+                "transition-all duration-200 ease-out",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30",
+
                 active
-                  ? "border-success bg-success/5 text-foreground"
-                  : "border-border bg-background text-muted-foreground hover:border-primary/50 hover:bg-muted/50"
+                  ? [
+                    "border-solid border-gold-deep",
+                    "bg-gold-deep/5",
+                    "text-foreground",
+                    "shadow-sm",
+                  ]
+                  : [
+                    "border-dashed border-border",
+                    "bg-background text-muted-foreground",
+                    "hover:border-gold-deep/60",
+                    "hover:bg-gold-deep/3",
+                    "hover:text-foreground",
+                  ]
               )}
             >
+              {active && (
+                <span
+                  className="
+                    absolute right-2.5 top-2.5
+                    flex size-5 items-center justify-center
+                    rounded-full bg-gold-deep text-white
+                  "
+                  aria-hidden="true"
+                >
+                  <svg
+                    width="11"
+                    height="11"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                  >
+                    <path d="m5 12 4 4L19 6" />
+                  </svg>
+                </span>
+              )}
+
               <Image
                 src={item.icon}
                 alt={item.name}
-                width={112}
-                height={96}
-                className="h-18 w-18 object-contain transition-transform duration-300 group-hover:scale-110"
-                quality={100}
+                className="
+                  h-20 w-20
+                  object-contain
+                  sepia-100
+                  transition-transform duration-200
+                  group-hover:scale-105
+                "
+                quality={60}
               />
 
-              <span className="text-xs whitespace-nowrap">
+              <span
+                className={cn(
+                  "mt-2 text-xs font-medium",
+                  active
+                    ? "text-foreground"
+                    : "text-muted-foreground"
+                )}
+              >
                 {item.name}
               </span>
             </button>
@@ -58,11 +105,19 @@ export function StepLocation({
 
       <Button
         type="button"
-        className="mt-8 w-full"
+        className="
+          mt-8 h-11 w-full
+          rounded-lg
+          font-medium
+          shadow-sm
+          transition-all
+          hover:shadow-md
+        "
         disabled={!city}
         onClick={onNext}
       >
         Continue
+        <span className="ml-2">→</span>
       </Button>
     </StepShell>
   );

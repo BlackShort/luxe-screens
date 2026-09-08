@@ -35,7 +35,7 @@ export function AuthTrigger({
         <Button
             type="button"
             variant="ghost"
-            size="sm"
+            // size="sm"
             onClick={handleClick}
             className={className}
         >

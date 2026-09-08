@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
@@ -16,7 +16,8 @@ import { StepPayment } from "@/components/booking/step-payment";
 import { StepReceipt } from "@/components/booking/step-receipt";
 import { HoldCountdown } from "@/components/booking/hold-count-down";
 import { useTheater } from "@/hooks/api/use-theater";
-import type { Booking, OccasionType } from "@/types";
+import { useTheaters } from "@/hooks/api/use-theaters";
+import type { Booking, OccasionType, Place } from "@/types";
 import { Button } from "@/components/ui/button";
 import { useBookingDraft } from "@/hooks/useBookingDraft";
 
@@ -44,8 +45,41 @@ function BookingWizard() {
   const [step, setStep] = useState(1);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [completedBooking, setCompletedBooking] = useState<Booking | null>(null);
-  
+
   const { theater } = useTheater(draft.theaterId);
+
+  const { theaters } = useTheaters();
+  const paramsAppliedRef = useRef(false);
+
+  useEffect(() => {
+    if (paramsAppliedRef.current || theaters.length === 0) return;
+
+    const cityParam = searchParams.get("city");
+    const theaterParam = searchParams.get("theater");
+    const dateParam = searchParams.get("date");
+
+    const cityValid = !!cityParam && theaters.some((t) => t.city === cityParam);
+
+    if (!cityValid) {
+      paramsAppliedRef.current = true;
+      return;
+    }
+
+    const theaterValid = !!theaterParam && theaters.some((t) => t.id === theaterParam && t.city === cityParam);
+    const dateValid = !!dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam);
+
+    update({
+      location: cityParam as Place,
+      ...(theaterValid ? { theaterId: theaterParam! } : {}),
+      ...(theaterValid && dateValid ? { date: dateParam! } : {}),
+    });
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setStep(theaterValid ? 3 : 2);
+    paramsAppliedRef.current = true;
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [theaters, searchParams]);
 
   function toggleCategory(id: string) {
     setSelectedCategories((prev) =>
@@ -124,14 +158,13 @@ function BookingWizard() {
     <main className="min-h-screen bg-background">
       <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
         {/* Header */}
-        <header className="mx-auto mb-10 max-w-xl text-center sm:mb-12">
+        <header className="mx-auto mb-10 max-w-3xl text-center sm:mb-12">
           <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl md:text-5xl">
-            Reserve your screen
+            Plan Your Celebration
           </h1>
 
-          <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-muted-foreground sm:text-base">
-            Create a private cinema experience tailored to
-            your evening.
+          <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
+            Choose your private space, set the date, and make it yours.
           </p>
         </header>
 
@@ -199,9 +232,6 @@ function BookingWizard() {
                   releaseHold(draft.holdToken);
                   update({
                     durationSlots,
-                    // A previously picked start time might not have room
-                    // for the new duration — make them re-pick rather than
-                    // silently carrying over an invalid selection.
                     date: undefined,
                     time: undefined,
                     holdToken: undefined,
