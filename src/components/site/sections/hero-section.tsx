@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useMemo } from "react";
-import { banner1, banner2, WhatsappIcon } from "@/assets";
+import { banner1, banner2, banner3, WhatsappIcon } from "@/assets";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { HeroSideWrapper } from "@/components/home/hero-side-wrapper";
@@ -17,6 +17,7 @@ export const HeroSection = () => {
         (): ImageSource[] => [
             { src: banner1, isStatic: true, priority: true },
             { src: banner2, isStatic: true, priority: false },
+            { src: banner3, isStatic: true, priority: false },
         ],
         [],
     );

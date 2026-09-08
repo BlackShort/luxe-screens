@@ -1,10 +1,9 @@
 "use client";
 
 import { Check } from "lucide-react";
-
 import { StepShell } from "@/components/booking/step-shell";
 import { Button } from "@/components/ui/button";
-import { addOns } from "@/data/addons";
+import { useAddOns } from "@/hooks/api/use-add-ons";
 import { cn, formatCurrency } from "@/lib/utils";
 import type { CartItem } from "@/types";
 
@@ -21,9 +20,22 @@ export function StepAddOnTypes({
   onNext: () => void;
   onBack: () => void;
 }) {
+  const { addOns, loading } = useAddOns();
+
   const relevant = addOns.filter((addOn) =>
     selectedCategories.includes(addOn.id)
   );
+
+  if (loading) {
+    return (
+      <StepShell
+        title="Select Add-on Types"
+        description="Choose as many options as you'd like. You can change this later."
+      >
+        <p className="text-sm text-muted-foreground">Loading options…</p>
+      </StepShell>
+    );
+  }
 
   if (relevant.length === 0) {
     return (

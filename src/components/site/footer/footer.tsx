@@ -3,7 +3,7 @@ import { logo } from "@/assets"
 import Image from "next/image"
 import Link from "next/link"
 import { MailIcon } from "lucide-react"
-import { footerSections, socialLinks, bottomLinks } from "@/lib/app-links"
+import { footerSections, socialLinks, bottomLinks } from "@/lib/navigation"
 
 export function Footer() {
     return (

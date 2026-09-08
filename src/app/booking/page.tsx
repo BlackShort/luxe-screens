@@ -1,11 +1,10 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useCallback, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
 import { StepIndicator } from "@/components/booking/step-indicator";
-import { useBookingDraft } from "@/hooks/useBookingDraft";
 import { StepLocation } from "@/components/booking/step-location";
 import { StepTheatre } from "@/components/booking/step-theatre";
 import { StepDateTime } from "@/components/booking/step-date-time";
@@ -15,30 +14,38 @@ import { StepAddOnCategories } from "@/components/booking/step-add-on-categories
 import { StepAddOnTypes } from "@/components/booking/step-add-on-types";
 import { StepPayment } from "@/components/booking/step-payment";
 import { StepReceipt } from "@/components/booking/step-receipt";
-import { getTheaterById } from "@/data/theaters";
+import { HoldCountdown } from "@/components/booking/hold-count-down";
+import { useTheater } from "@/hooks/api/use-theater";
 import type { Booking, OccasionType } from "@/types";
 import { Button } from "@/components/ui/button";
+import { useBookingDraft } from "@/hooks/useBookingDraft";
 
 const TOTAL_STEPS = 9;
+
+// Fire-and-forget release, it's used when the user abandons a held slot
+function releaseHold(holdToken: string | undefined) {
+  if (!holdToken) return;
+  fetch("/api/slots/hold", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ holdToken }),
+    keepalive: true,
+  }).catch(() => { });
+}
 
 function BookingWizard() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const preselectedOccasion =
-    searchParams.get("occasion") as OccasionType | null;
+  const preselectedOccasion = searchParams.get("occasion") as OccasionType | null;
 
   const { draft, update, toggleCartItem } = useBookingDraft();
 
   const [step, setStep] = useState(1);
-  const [selectedCategories, setSelectedCategories] =
-    useState<string[]>([]);
-  const [completedBooking, setCompletedBooking] =
-    useState<Booking | null>(null);
-
-  const theater = draft.theaterId
-    ? getTheaterById(draft.theaterId)
-    : undefined;
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [completedBooking, setCompletedBooking] = useState<Booking | null>(null);
+  
+  const { theater } = useTheater(draft.theaterId);
 
   function toggleCategory(id: string) {
     setSelectedCategories((prev) =>
@@ -48,12 +55,70 @@ function BookingWizard() {
     );
   }
 
+  const handleHold = useCallback(
+    async (
+      date: string,
+      time: string,
+      durationSlots: number
+    ): Promise<{ ok: true } | { ok: false; error: string }> => {
+      if (!draft.theaterId) return { ok: false, error: "Select a theatre first." };
+
+      releaseHold(draft.holdToken);
+
+      try {
+        const res = await fetch("/api/slots/hold", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            theaterId: draft.theaterId,
+            date,
+            time,
+            durationSlots,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          return { ok: false, error: data.error ?? "That time is no longer available." };
+        }
+
+        update({
+          date,
+          time,
+          durationSlots,
+          holdToken: data.holdToken,
+          holdExpiresAt: data.expiresAt,
+        });
+
+        return { ok: true };
+      } catch {
+        return { ok: false, error: "Couldn't reach the server. Please try again." };
+      }
+    },
+    [draft.theaterId, draft.holdToken, update]
+  );
+
+  function handleHoldExpired() {
+    releaseHold(draft.holdToken);
+    update({
+      date: undefined,
+      time: undefined,
+      holdToken: undefined,
+      holdExpiresAt: undefined,
+    });
+    setStep(3);
+  }
+
   function goDone() {
     setStep(1);
     setCompletedBooking(null);
     setSelectedCategories([]);
     router.push("/");
   }
+
+  // Steps from Contact through Payment all happen while a hold is live - show the countdown consistently across them.
+  const showCountdown = step >= 4 && step <= 8 && draft.holdExpiresAt;
 
   return (
     <main className="min-h-screen bg-background">
@@ -71,81 +136,100 @@ function BookingWizard() {
         </header>
 
         {step <= TOTAL_STEPS ? (
-          <div className="mx-auto mb-10 max-w-xl">
+          <div className="mx-auto mb-10 max-w-2xl">
             <StepIndicator current={step} />
           </div>
         ) : null}
 
         {/* Main booking area */}
-        <div className="mx-auto max-w-xl">
+        <div className="mx-auto max-w-2xl">
+          {showCountdown ? (
+            <HoldCountdown
+              expiresAt={draft.holdExpiresAt!}
+              onExpire={handleHoldExpired}
+            />
+          ) : null}
+
           <div className="relative">
-            {/* Step 1 — Location */}
             {step === 1 ? (
               <StepLocation
                 city={draft.location}
-                onSelectCity={(city) =>
+                onSelectCity={(city) => {
+                  releaseHold(draft.holdToken);
                   update({
                     location: city,
                     theaterId: undefined,
                     date: undefined,
                     time: undefined,
-                    slotId: undefined,
-                  })
-                }
+                    holdToken: undefined,
+                    holdExpiresAt: undefined,
+                  });
+                }}
                 onNext={() => setStep(2)}
               />
             ) : null}
 
-            {/* Step 2 — Theatre */}
             {step === 2 ? (
               <StepTheatre
                 city={draft.location}
                 theaterId={draft.theaterId}
-                onSelectTheater={(theaterId) =>
+                onSelectTheater={(theaterId) => {
+                  releaseHold(draft.holdToken);
                   update({
                     theaterId,
                     date: undefined,
                     time: undefined,
-                    slotId: undefined,
-                  })
-                }
+                    holdToken: undefined,
+                    holdExpiresAt: undefined,
+                  });
+                }}
                 onNext={() => setStep(3)}
                 onBack={() => setStep(1)}
               />
             ) : null}
 
-            {/* Step 3 — Date & Time */}
             {step === 3 ? (
               <StepDateTime
                 theaterId={draft.theaterId}
                 date={draft.date}
                 time={draft.time}
-                onSelect={(date, time, slotId) =>
+                durationSlots={draft.durationSlots}
+                onSelect={(date, time) => update({ date, time })}
+                onSelectDuration={(durationSlots) => {
+                  releaseHold(draft.holdToken);
                   update({
-                    date,
-                    time,
-                    slotId,
-                  })
-                }
+                    durationSlots,
+                    // A previously picked start time might not have room
+                    // for the new duration — make them re-pick rather than
+                    // silently carrying over an invalid selection.
+                    date: undefined,
+                    time: undefined,
+                    holdToken: undefined,
+                    holdExpiresAt: undefined,
+                  });
+                }}
+                onHold={handleHold}
                 onNext={() => setStep(4)}
                 onBack={() => setStep(2)}
               />
             ) : null}
 
-            {/* Step 4 — Contact */}
             {step === 4 ? (
               <StepContact
                 contact={draft.contact ?? {}}
                 guests={draft.guests ?? 1}
                 maxGuests={theater?.maxCapacity ?? 12}
-                onChange={(contact) => update({ contact })}
-                onGuestsChange={(guests) => update({ guests })}
+                onChange={(contact) =>
+                  update({ contact })
+                }
+                onGuestsChange={(guests) =>
+                  update({ guests })
+                }
                 onNext={() => setStep(5)}
                 onBack={() => setStep(3)}
               />
             ) : null}
 
-            {/* Step 5 — Occasion */}
             {step === 5 ? (
               <StepOccasion
                 occasion={
@@ -154,7 +238,9 @@ function BookingWizard() {
                   undefined
                 }
                 note={draft.occasionNote}
-                onSelect={(occasion) => update({ occasion })}
+                onSelect={(occasion) =>
+                  update({ occasion })
+                }
                 onNoteChange={(occasionNote) =>
                   update({ occasionNote })
                 }
@@ -163,7 +249,6 @@ function BookingWizard() {
               />
             ) : null}
 
-            {/* Step 6 — Add-on Categories */}
             {step === 6 ? (
               <StepAddOnCategories
                 selected={selectedCategories}
@@ -173,7 +258,6 @@ function BookingWizard() {
               />
             ) : null}
 
-            {/* Step 7 — Add-on Types */}
             {step === 7 ? (
               <StepAddOnTypes
                 selectedCategories={selectedCategories}
@@ -184,7 +268,6 @@ function BookingWizard() {
               />
             ) : null}
 
-            {/* Step 8 — Payment */}
             {step === 8 ? (
               <StepPayment
                 draft={draft}
@@ -196,7 +279,6 @@ function BookingWizard() {
               />
             ) : null}
 
-            {/* Step 9 — Receipt */}
             {step === 9 && completedBooking ? (
               <StepReceipt
                 booking={completedBooking}
@@ -205,6 +287,7 @@ function BookingWizard() {
             ) : null}
           </div>
 
+          {/* Trust / reassurance */}
           {step < 9 ? (
             <div className="mt-5 flex items-center justify-center gap-2 text-center text-xs text-muted-foreground">
               <span className="h-1.5 w-1.5 rounded-full bg-primary/60" />

@@ -11,6 +11,7 @@
 # testing
 /coverage
 
+*.zip
 # next.js
 /.next/
 /out/
@@ -36,3 +37,14 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+/src/generated/prisma
+src/app/ai-planner
+src/app/auth
+src/components/auth/
+src/app/gallery
+src/app/waitlist
+/docs
+.vscode
+src/components/site/header/auth-trigger.tsx
+src/configs/

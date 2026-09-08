@@ -2,6 +2,7 @@ import logo from "@/assets/logo/logo-light.png";
 
 import banner1 from "@/assets/banners/image1.jpg";
 import banner2 from "@/assets/banners/image2.jpg";
+import banner3 from "@/assets/banners/image3.png";
 
 import TwitterIcon from "@/assets/svgs/twitter.svg";
 import InstagramIcon from "@/assets/svgs/instagram.svg";
@@ -24,6 +25,7 @@ export {
     logo,
     banner1,
     banner2,
+    banner3,
     FacebookIcon,
     InstagramIcon,
     TwitterIcon,

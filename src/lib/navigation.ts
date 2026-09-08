@@ -1,5 +1,9 @@
 import { WhatsappIcon, InstagramIcon, YoutubeIcon, TwitterIcon, FacebookIcon } from "@/assets"
 
+export const goBack = () => {
+    window.history.back();
+};
+
 export const navigationLinks = [
     { label: "Locations", href: "#locations" },
     { label: "Occasions", href: "#occasions" },

@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatCurrency, formatDate, formatTime, generateId } from "@/lib/utils";
 import { cartSubtotal } from "@/lib/pricing";
-import { getTheaterById } from "@/data/theaters";
+import { endTimeFor } from "@/lib/slot-times";
+import { useTheater } from "@/hooks/api/use-theater";
 import type { BookingDraft, Booking } from "@/types";
 
 export function StepPayment({
@@ -19,9 +20,8 @@ export function StepPayment({
   onConfirmed: (booking: Booking) => void;
   onBack: () => void;
 }) {
-  const theater = draft.theaterId
-    ? getTheaterById(draft.theaterId)
-    : undefined;
+  const { theater } = useTheater(draft.theaterId);
+  const durationSlots = draft.durationSlots ?? 1;
 
   const [couponInput, setCouponInput] = useState("");
 
@@ -42,9 +42,8 @@ export function StepPayment({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const subtotal =
-    (theater?.basePrice ?? 0) +
-    cartSubtotal(draft.cart);
+  const roomPrice = (theater?.basePrice ?? 0) * durationSlots;
+  const subtotal = roomPrice + cartSubtotal(draft.cart);
 
   const displayTotal = useMemo(() => {
     if (couponState.status === "valid") {
@@ -97,11 +96,14 @@ export function StepPayment({
     if (
       !theater ||
       !draft.location ||
-      !draft.slotId ||
-      !draft.date ||
-      !draft.time ||
+      !draft.holdToken ||
       !draft.occasion
     ) {
+      return;
+    }
+
+    if (draft.holdExpiresAt && new Date(draft.holdExpiresAt) <= new Date()) {
+      setError("Your held time has expired. Please go back and pick a time again.");
       return;
     }
 
@@ -117,9 +119,7 @@ export function StepPayment({
         body: JSON.stringify({
           location: draft.location,
           theaterId: theater.id,
-          slotId: draft.slotId,
-          date: draft.date,
-          time: draft.time,
+          holdToken: draft.holdToken,
           guests: draft.guests ?? 1,
           contact: {
             name: draft.contact?.name ?? "",
@@ -207,9 +207,22 @@ export function StepPayment({
             <span className="text-right text-foreground">
               {formatDate(draft.date)} ·{" "}
               {formatTime(draft.time)}
+              {endTimeFor(draft.time, durationSlots)
+                ? ` – ${formatTime(endTimeFor(draft.time, durationSlots)!)}`
+                : ""}
             </span>
           </div>
         ) : null}
+
+        <div className="flex justify-between gap-4 text-muted-foreground">
+          <span>Room price</span>
+          <span className="text-right text-foreground">
+            {formatCurrency(roomPrice)}
+            {durationSlots > 1
+              ? ` (${formatCurrency(theater.basePrice)} × ${durationSlots} slots)`
+              : ""}
+          </span>
+        </div>
 
         <div className="flex justify-between gap-4 text-muted-foreground">
           <span>Occasion</span>

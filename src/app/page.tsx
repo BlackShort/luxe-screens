@@ -1,5 +1,7 @@
 "use client";
 
+import { Suspense } from "react";
+
 import { Footer } from "@/components/site/footer/footer";
 import { Header } from "@/components/site/header/header";
 import { HeroSection } from "@/components/site/sections/hero-section";
@@ -9,6 +11,8 @@ import { Services } from "@/components/site/sections/services-section";
 import { FAQs } from "@/components/site/sections/faq-section";
 import { Contact } from "@/components/site/sections/contact-section";
 import { Gallery } from "@/components/site/sections/gallery-section";
+
+import { AuthModalHost } from "@/components/auth/auth-modal-host";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function Home() {
@@ -17,6 +21,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col">
       <Header variant={isMobile ? "sticky" : "fixed"} />
+      
       <section className="flex-1">
         <HeroSection />
         <Presence />
@@ -26,7 +31,12 @@ export default function Home() {
         <FAQs />
         <Contact />
       </section>
+
       <Footer />
+
+      <Suspense fallback={null}>
+        <AuthModalHost />
+      </Suspense>
     </main>
   );
 }

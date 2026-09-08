@@ -4,16 +4,16 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
-
-import { theaters } from "@/data/theaters";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/site/common/reveal";
+import { useTheaters } from "@/hooks/api/use-theaters";
 
 export function Gallery() {
     const [index, setIndex] = useState(0);
+    const { theaters, loading } = useTheaters();
 
-    const theater = theaters[index] ?? theaters[0]!;
+    const theater = theaters[index] ?? theaters[0];
 
     function go(delta: number) {
         setIndex(
@@ -22,6 +22,15 @@ export function Gallery() {
         );
     }
 
+    if (loading || !theater) {
+        return (
+            <section id="gallery" className="py-16 px-5 sm:px-8 sm:py-20 lg:px-16">
+                <div className="mx-auto w-full max-w-6xl">
+                    <div className="card-premium h-105 animate-pulse bg-muted" />
+                </div>
+            </section>
+        );
+    }
     return (
         <section id="gallery" className="py-16 px-5 sm:px-8 sm:py-20 lg:px-16">
             <div className="relative">

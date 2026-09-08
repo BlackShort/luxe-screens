@@ -3,7 +3,8 @@
 import { CheckCircle2 } from "lucide-react";
 import { StepShell } from "@/components/booking/step-shell";
 import { Button } from "@/components/ui/button";
-import { getTheaterById } from "@/data/theaters";
+import { useTheater } from "@/hooks/api/use-theater";
+import { endTimeFor } from "@/lib/slot-times";
 import {
   formatCurrency,
   formatDate,
@@ -18,7 +19,7 @@ export function StepReceipt({
   booking: Booking;
   onDone: () => void;
 }) {
-  const theater = getTheaterById(booking.theaterId);
+  const { theater } = useTheater(booking.theaterId);
 
   return (
     <StepShell title="Receipt">
@@ -51,7 +52,13 @@ export function StepReceipt({
 
         <Row
           label="Date & time"
-          value={`${formatDate(booking.date)} · ${formatTime(booking.time)}`}
+          value={(() => {
+            const end = endTimeFor(booking.time, booking.durationSlots);
+            const range = end
+              ? `${formatTime(booking.time)} – ${formatTime(end)}`
+              : formatTime(booking.time);
+            return `${formatDate(booking.date)} · ${range}`;
+          })()}
         />
 
         <Row

@@ -1,9 +1,9 @@
 import { z } from "zod";
+import { MAX_CONSECUTIVE_SLOTS } from "@/lib/slot-times";
 
-// Shared, real validation used on both the client (inline form feedback)
-// and the server (API routes) so nothing trusts the client alone.
-
+// Shared, real validation used on both the client (inline form feedback) and the server (API routes
 const NAME_RE = /^[a-zA-Z\s.'-]{2,60}$/;
+
 // India-friendly phone: optional +91, then 10 digits starting 6-9.
 const PHONE_RE = /^(?:\+91[\s-]?)?[6-9]\d{9}$/;
 
@@ -29,10 +29,13 @@ export const contactSchema = z.object({
 export const citySchema = z.enum([
   "Delhi",
   "Ahmedabad",
-  "Noida",
+  "Hyderabad",
   "Bangalore",
   "Mumbai",
   "Lucknow",
+  "Chennai",
+  "Pune",
+  "Vishakhapatnam",
 ]);
 
 export const occasionTypeSchema = z.enum([
@@ -68,14 +71,23 @@ export const couponValidateSchema = z.object({
   subtotal: z.number().nonnegative().max(1000000),
 });
 
-export const bookingCreateSchema = z.object({
-  location: citySchema,
+export const holdRequestSchema = z.object({
   theaterId: z.string().regex(/^[a-z0-9-]{3,40}$/i, "Invalid theater id"),
-  slotId: z.string().min(3).max(100),
   date: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format"),
   time: z.string().regex(/^\d{2}:\d{2}$/, "Time must be in HH:MM format"),
+  durationSlots: z.number().int().min(1).max(MAX_CONSECUTIVE_SLOTS),
+});
+
+export const holdReleaseSchema = z.object({
+  holdToken: z.string().min(3).max(100),
+});
+
+export const bookingCreateSchema = z.object({
+  location: citySchema,
+  theaterId: z.string().regex(/^[a-z0-9-]{3,40}$/i, "Invalid theater id"),
+  holdToken: z.string().min(3).max(100),
   guests: z.number().int().min(1, "At least 1 guest").max(30, "Max 30 guests"),
   contact: contactSchema,
   occasion: occasionTypeSchema,
@@ -135,5 +147,8 @@ export const plannerSchema = z.object({
 
 export type ContactInput = z.infer<typeof contactSchema>;
 export type BookingCreateInput = z.infer<typeof bookingCreateSchema>;
+export type HoldRequestInput = z.infer<typeof holdRequestSchema>;
+export type HoldReleaseInput = z.infer<typeof holdReleaseSchema>;
 export type WaitlistInput = z.infer<typeof waitlistSchema>;
+export type ContactMessageInput = z.infer<typeof contactMessageSchema>;
 export type PlannerInput = z.infer<typeof plannerSchema>;

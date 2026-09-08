@@ -19,9 +19,9 @@ export function StepLocation({
   return (
     <StepShell
       title="Select Location"
-      description="Choose the city for your private cinema experience."
+      description="Pick a city to see the rooms available there."
     >
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {cities.map((item) => {
           const active = city === item.name;
 
@@ -32,20 +32,20 @@ export function StepLocation({
               aria-pressed={active}
               onClick={() => onSelectCity(item.name as Place)}
               className={cn(
-                "group flex flex-col items-center justify-center gap-2 rounded-lg border px-4 py-3 text-left text-sm transition-colors",
+                "group flex items-center justify-around gap-2 rounded-lg border px-4 py-3 text-left text-sm transition-colors",
                 "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
                 active
-                  ? "border-gold-deep bg-gold-deep/5 text-foreground"
+                  ? "border-success bg-success/5 text-foreground"
                   : "border-border bg-background text-muted-foreground hover:border-primary/50 hover:bg-muted/50"
               )}
             >
               <Image
                 src={item.icon}
                 alt={item.name}
-                width={72}
-                height={72}
-                className="h-18 w-18 object-contain transition-transform duration-300 group-hover:scale-110 sepia-100"
-                quality={50}
+                width={112}
+                height={96}
+                className="h-18 w-18 object-contain transition-transform duration-300 group-hover:scale-110"
+                quality={100}
               />
 
               <span className="text-xs whitespace-nowrap">
@@ -58,7 +58,6 @@ export function StepLocation({
 
       <Button
         type="button"
-        variant="default"
         className="mt-8 w-full"
         disabled={!city}
         onClick={onNext}
