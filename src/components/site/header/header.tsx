@@ -3,9 +3,17 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Menu } from "lucide-react";
 
 import { logo } from "@/assets";
 import { Button } from "@/components/ui/button";
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "@/components/ui/sheet";
 import { AuthTrigger } from "@/components/site/header/auth-trigger";
 import { navigationLinks } from "@/lib/navigation";
 
@@ -15,6 +23,7 @@ interface HeaderProps {
 
 export function Header({ variant = "sticky" }: HeaderProps) {
     const [isScrolled, setIsScrolled] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     useEffect(() => {
         if (variant !== "fixed") {
@@ -37,9 +46,9 @@ export function Header({ variant = "sticky" }: HeaderProps) {
     const isLightHeader = variant === "sticky" || variant === "static" || isScrolled;
 
     const shouldInvertLogo = () => {
-        if (variant === 'sticky' || variant === 'static') return true;
+        if (variant === "sticky" || variant === "static") return true;
         return isScrolled;
-    }
+    };
 
     return (
         <header
@@ -50,7 +59,7 @@ export function Header({ variant = "sticky" }: HeaderProps) {
                         ? "sticky"
                         : "fixed"
                 }
-                top-0 z-50 w-full pt-4
+                top-0 z-50 w-full pt-3 px-3 lg:pt-4 lg:px-0
             `}
         >
             <div
@@ -64,12 +73,12 @@ export function Header({ variant = "sticky" }: HeaderProps) {
                 {/* Logo */}
                 <Link
                     href="/"
-                    className="flex items-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95"
+                    className="flex shrink-0 items-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95"
                 >
                     <Image
                         src={logo}
                         alt="Luxe Screens"
-                        className={`w-fit h-8 object-contain drop-shadow-sm group-hover:drop-shadow-md transition-all duration-300 ${shouldInvertLogo()
+                        className={`h-7 w-fit object-contain drop-shadow-sm transition-all duration-300 group-hover:drop-shadow-md sm:h-8 ${shouldInvertLogo()
                             ? "filter invert-0 brightness-0 contrast-100"
                             : ""
                             }`}
@@ -78,7 +87,7 @@ export function Header({ variant = "sticky" }: HeaderProps) {
                         sizes="(max-width: 640px) 96px, (max-width: 768px) 108px, (max-width: 1024px) 120px, (max-width: 1280px) 144px, (max-width: 1536px) 168px, 192px"
                     />
                     <h1
-                        className={`ml-2 font-serif text-sm sm:text-base md:text-lg lg:text-xl font-medium tracking-tight transition-all duration-300 ${shouldInvertLogo()
+                        className={`ml-1 font-serif text-sm font-medium tracking-tight transition-all duration-300 sm:ml-2 sm:text-base md:text-lg lg:text-xl ${shouldInvertLogo()
                             ? "text-foreground"
                             : "text-white/90 drop-shadow-md"
                             }`}
@@ -87,7 +96,7 @@ export function Header({ variant = "sticky" }: HeaderProps) {
                     </h1>
                 </Link>
 
-                {/* Navigation */}
+                {/* Desktop navigation (unchanged, >= lg) */}
                 <nav className="hidden flex-1 justify-center space-x-4 lg:flex xl:space-x-6">
                     {navigationLinks.map((link) => (
                         <Link
@@ -102,17 +111,15 @@ export function Header({ variant = "sticky" }: HeaderProps) {
                             `}
                         >
                             {link.label}
-
-                            <span
-                                className="absolute -bottom-1 left-0 h-px w-0 bg-current transition-all duration-300 group-hover/nav:w-full"
-                            />
+                            <span className="absolute -bottom-1 left-0 h-px w-0 bg-current transition-all duration-300 group-hover/nav:w-full" />
                         </Link>
                     ))}
                 </nav>
 
                 {/* Actions */}
                 <div className="flex shrink-0 items-center gap-1 sm:gap-2 lg:gap-4">
-                    <div className="hidden items-center gap-1 md:flex sm:gap-2">
+                    {/* Desktop actions (unchanged, >= lg) */}
+                    <div className="hidden items-center gap-1 sm:gap-2 lg:flex">
                         <AuthTrigger
                             className={`h-7 rounded-full px-2 transition-all duration-300 hover:scale-105 active:scale-95 sm:h-8 sm:px-3 lg:h-9 lg:px-4
                                 ${isLightHeader
@@ -170,6 +177,69 @@ export function Header({ variant = "sticky" }: HeaderProps) {
                             </Button>
                         </Link>
                     </div>
+
+                    {/* Mobile / tablet: compact Book CTA stays visible, everything else moves into the sheet */}
+                    <Link href="/booking" className="lg:hidden">
+                        <Button
+                            size="sm"
+                            className={`
+                                btn-shine h-7 rounded-full px-2.5 text-xs font-medium transition-all duration-300 active:scale-95 sm:h-8 sm:px-3 sm:text-sm
+                                ${isLightHeader
+                                    ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary"
+                                    : "bg-white/90 text-foreground shadow-lg backdrop-blur-sm hover:bg-white"
+                                }
+                            `}
+                        >
+                            Book
+                        </Button>
+                    </Link>
+
+                    {/* Mobile / tablet menu trigger */}
+                    <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                        <SheetTrigger
+                            render={
+                                <button
+                                    type="button"
+                                    aria-label="Open menu"
+                                    className={`flex size-8 items-center justify-center rounded-full border transition-all duration-300 active:scale-95 sm:size-9 lg:hidden ${isMobileMenuOpen
+                                            ? "border-foreground bg-foreground text-background"
+                                            : "border-border bg-background text-foreground"
+                                        }`}
+                                >
+                                    <Menu className="size-4 sm:size-5" />
+                                </button>
+                            }
+                        />
+
+                        <SheetContent side="right" className="w-[85%] max-w-xs sm:max-w-sm">
+                            <SheetHeader>
+                                <SheetTitle className="font-serif text-lg">Luxe Screens</SheetTitle>
+                            </SheetHeader>
+
+                            <nav className="mt-6 flex flex-col gap-1 px-4">
+                                {navigationLinks.map((link) => (
+                                    <Link
+                                        key={link.label}
+                                        href={link.href}
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="rounded-lg px-3 py-2.5 text-sm font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
+                                    >
+                                        {link.label}
+                                    </Link>
+                                ))}
+                            </nav>
+
+                            <div className="mt-6 flex flex-col gap-3 border-t px-4 pt-6">
+                                <AuthTrigger className="w-full justify-center rounded-full border border-border/70 text-foreground/80 hover:bg-muted" />
+
+                                <Link href="/booking" onClick={() => setIsMobileMenuOpen(false)}>
+                                    <Button className="btn-shine w-full rounded-full bg-primary text-primary-foreground">
+                                        Book Now
+                                    </Button>
+                                </Link>
+                            </div>
+                        </SheetContent>
+                    </Sheet>
                 </div>
             </div>
         </header>

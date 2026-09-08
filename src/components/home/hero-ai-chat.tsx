@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
     ArrowLeft,
     ArrowRight,
@@ -16,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useTheaters } from "@/hooks/api/use-theaters";
 import { cn } from "@/lib/utils";
+import type { OccasionType } from "@/types";
 
 type Step = "occasion" | "guests" | "budget" | "result";
 
@@ -35,6 +37,15 @@ const occasions = [
 ];
 
 const guestOptions = [2, 4, 6, 8, 10];
+
+const OCCASION_TO_BOOKING_TYPE: Record<string, OccasionType | undefined> = {
+    Birthday: "Birthday",
+    Anniversary: "Anniversary",
+    "Date night": "Date",
+    Proposal: "Engagement",
+    "Friends & family": "Party",
+    "Just because": undefined,
+};
 
 const budgetOptions = [
     {
@@ -60,6 +71,7 @@ export function HeroAIChat({
 }: {
     onClose: () => void;
 }) {
+    const router = useRouter();
     const { theaters, loading } = useTheaters();
 
     const [step, setStep] = useState<Step>("occasion");
@@ -426,8 +438,16 @@ export function HeroAIChat({
                                 type="button"
                                 className="h-10 w-full rounded-xl bg-primary text-xs text-primary-foreground hover:bg-primary"
                                 onClick={() => {
-                                    // todo: Connect with booking flow.
-                                    // We can pass the recommended theatre here.
+                                    const bookingOccasion = OCCASION_TO_BOOKING_TYPE[occasion];
+                                    const params = new URLSearchParams({
+                                        city: recommendation.theatre.city,
+                                        theater: recommendation.theatre.id,
+                                        ...(bookingOccasion
+                                            ? { occasion: bookingOccasion }
+                                            : {}),
+                                    });
+
+                                    router.push(`/booking?${params.toString()}`);
                                 }}
                             >
                                 Start this booking

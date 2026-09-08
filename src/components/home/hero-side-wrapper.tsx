@@ -13,7 +13,7 @@ export function HeroSideWrapper({
     onToggleAI,
 }: HeroSideWrapperProps) {
     return (
-        <div className="relative w-full max-w-90">
+        <div className="relative w-full max-w-90 scale-80 lg:scale-100">
             {showAI ? (
                 <HeroAIChat onClose={onToggleAI} />
             ) : (
