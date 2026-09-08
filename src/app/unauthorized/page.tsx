@@ -5,12 +5,9 @@ import { Header } from "@/components/site/header/header";
 import { Footer } from "@/components/site/footer/footer";
 import { Button } from "@/components/ui/button";
 import { ShieldX, Home, ArrowLeft } from "lucide-react";
+import { goBack } from "@/lib/navigation";
 
 export default function UnauthorizedPage() {
-    const handleGoBack = () => {
-        window.history.back();
-    };
-
     return (
         <div className="flex min-h-screen flex-col bg-background">
             <Header />
@@ -67,7 +64,7 @@ export default function UnauthorizedPage() {
                             type="button"
                             size="lg"
                             variant="outline"
-                            onClick={handleGoBack}
+                            onClick={goBack}
                             className="h-11 rounded-xl border-border bg-card/50 px-6 text-sm font-medium text-foreground backdrop-blur-sm transition-all duration-300 hover:border-primary/40 hover:bg-secondary hover:text-foreground"
                         >
                             <ArrowLeft className="mr-2 size-4" />

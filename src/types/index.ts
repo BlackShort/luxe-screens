@@ -1,6 +1,12 @@
 import { LucideIcon } from "lucide-react";
 import { StaticImageData } from "next/image";
 
+export interface ImageSource {
+  src: string | StaticImageData;
+  isStatic: boolean;
+  priority: boolean;
+}
+
 export type Place =
   | "Delhi"
   | "Ahmedabad"
@@ -11,12 +17,6 @@ export type Place =
   | "Chennai"
   | "Pune"
   | "Vishakhapatnam";
-
-export interface ImageSource {
-  src: string | StaticImageData;
-  isStatic: boolean;
-  priority: boolean;
-}
 
 export type City = {
   name: Place;
@@ -38,7 +38,7 @@ export interface Theater {
   reviewCount: number;
 }
 
-export type SlotStatus = "AVAILABLE" | "HELD" | "BOOKED";
+export type SlotStatus = "AVAILABLE" | "HELD" | "BOOKED" | "PAST";
 
 export interface Slot {
   id: string;
@@ -66,6 +66,7 @@ export interface Occasion {
 export type AddOnCategory = "CAKE" | "DECORATION" | "GIFT" | "FOOD" | "DRINK" | "PROJECTOR";
 
 export interface AddOnOption {
+  id?: string;
   name: string;
   price: number;
   image?: string;
@@ -76,6 +77,13 @@ export interface AddOn {
   category: AddOnCategory;
   label: string;
   icon: LucideIcon;
+  options: AddOnOption[];
+}
+
+export interface AddOnDTO {
+  id: string;
+  category: AddOnCategory;
+  label: string;
   options: AddOnOption[];
 }
 
@@ -99,7 +107,8 @@ export interface Booking {
   id: string;
   location: Place;
   theaterId: string;
-  slotId: string;
+  slotIds: string[];
+  durationSlots: number;
   date: string;
   time: string;
   guests: number;
@@ -151,11 +160,12 @@ export interface WaitlistEntry {
   city: string;
 }
 
-// Booking wizard step contract shared between client state and API payloads.
 export interface BookingDraft {
   location?: Place;
   theaterId?: string;
-  slotId?: string;
+  holdToken?: string;
+  holdExpiresAt?: string;
+  durationSlots?: number;
   date?: string;
   time?: string;
   contact?: Partial<BookingContact>;

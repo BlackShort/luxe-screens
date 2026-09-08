@@ -22,16 +22,15 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 
 import { cities } from "@/data/content";
-import { theaters } from "@/data/theaters";
 import type { Place, Theater } from "@/types";
 import { cn } from "@/lib/utils";
+import { useTheaters } from "@/hooks/api/use-theaters";
 
-
-const glassFieldClass =
-    "h-10! w-full rounded-xl border-white/15! bg-white/10! px-3 text-white! backdrop-blur-md hover:bg-white/12! hover:text-white! focus-visible:border-primary! focus-visible:ring-primary/30! disabled:cursor-not-allowed! disabled:opacity-40! disabled:border-white/10! disabled:bg-white/5! data-placeholder:text-white/60! [&_svg]:text-white/70!";
+const glassFieldClass = "h-10! w-full rounded-xl border-white/15! bg-white/10! px-3 text-white! backdrop-blur-md hover:bg-white/12! hover:text-white! focus-visible:border-primary! focus-visible:ring-primary/30! disabled:cursor-not-allowed! disabled:opacity-40! disabled:border-white/10! disabled:bg-white/5! data-placeholder:text-white/60! [&_svg]:text-white/70!";
 
 export function HeroBookingForm() {
     const router = useRouter();
+    const { theaters, loading } = useTheaters();
 
     const [city, setCity] = useState<Place | "">("");
     const [theater, setTheater] = useState<Theater | null>(null);
@@ -43,7 +42,7 @@ export function HeroBookingForm() {
         return theaters.filter(
             (theater) => theater.city === city
         );
-    }, [city]);
+    }, [city, theaters]);
 
     const today = useMemo(() => {
         const current = new Date();
@@ -136,7 +135,7 @@ export function HeroBookingForm() {
 
                             setTheater(selectedTheater);
                         }}
-                        disabled={!city}
+                        disabled={!city || loading}
                     >
                         <SelectTrigger
                             size="default"
@@ -145,9 +144,11 @@ export function HeroBookingForm() {
                             <MapPinHouse aria-hidden="true" className="shrink-0" />
                             <SelectValue
                                 placeholder={
-                                    city
-                                        ? "Select theatre"
-                                        : "Select a city first"
+                                    !city
+                                        ? "Select a city first"
+                                        : loading
+                                            ? "Loading theatres..."
+                                            : "Select theatre"
                                 }
                             >
                                 {theater?.name}

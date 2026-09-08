@@ -4,8 +4,9 @@ import { Star, Users } from "lucide-react";
 
 import { StepShell } from "@/components/booking/step-shell";
 import { Button } from "@/components/ui/button";
-import { theaters } from "@/data/theaters";
+import { useTheaters } from "@/hooks/api/use-theaters";
 import { formatCurrency, cn } from "@/lib/utils";
+import type { Place } from "@/types";
 
 export function StepTheatre({
     city,
@@ -14,12 +15,14 @@ export function StepTheatre({
     onNext,
     onBack,
 }: {
-    city?: string;
+    city?: Place;
     theaterId?: string;
     onSelectTheater: (theaterId: string) => void;
     onNext: () => void;
     onBack: () => void;
 }) {
+    const { theaters, loading } = useTheaters();
+
     const roomsInCity = city
         ? theaters.filter((theater) => theater.city === city)
         : [];
@@ -39,7 +42,11 @@ export function StepTheatre({
                         Theatres in {city}
                     </p>
 
-                    {roomsInCity.length > 0 ? (
+                    {loading ? (
+                        <p className="text-sm text-muted-foreground">
+                            Loading theatres…
+                        </p>
+                    ) : roomsInCity.length > 0 ? (
                         roomsInCity.map((room) => {
                             const active = theaterId === room.id;
 

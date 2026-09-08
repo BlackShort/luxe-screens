@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum SlotStatus {
+  HELD
+  BOOKED
+}
+
+enum AddOnCategory {
+  CAKE
+  DECORATION
+  GIFT
+  FOOD
+  DRINK
+  PROJECTOR
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+model Theater {
+  id          String   @id @default(cuid())
+  name        String
+  city        String
+  address     String
+  basePrice   Int
+  maxCapacity Int
+  screen      String
+  sound       String
+  amenities   String[]
+  images      String[]
+  rating      Float    @default(0)
+  reviewCount Int      @default(0)
+
+  slots    Slot[]
+  bookings Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([city])
+}
+
+model Slot {
+  id        String     @id @default(cuid())
+  date      String // ISO date, e.g. 2026-09-10
+  time      String // e.g. "14:30"
+  status    SlotStatus
+
+  theaterId String
+  theater   Theater    @relation(fields: [theaterId], references: [id], onDelete: Cascade)
+
+  holdToken     String?
+  holdExpiresAt DateTime?
+  bookingId String?
+  booking   Booking? @relation(fields: [bookingId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([theaterId, date, time])
+  @@index([theaterId, date])
+  @@index([bookingId])
+  @@index([holdToken])
+}
+
+model AddOn {
+  id       String        @id @default(cuid())
+  category AddOnCategory @unique
+  label    String
+  options  AddOnOption[]
+  cartItems CartItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AddOnOption {
+  id      String @id @default(cuid())
+  name    String
+  price   Int
+  addOnId String
+  addOn   AddOn  @relation(fields: [addOnId], references: [id], onDelete: Cascade)
+
+  @@unique([addOnId, name])
+}
+
+model Coupon {
+  code        String   @id
+  description String
+  percentOff  Int
+  minSpend    Int
+  active      Boolean  @default(true)
+  bookings    Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Booking {
+  id           String        @id @default(cuid())
+  location     String
+  date         String
+  time         String // start time of the first slot
+  durationSlots Int          @default(1) // how many consecutive Slot rows this booking holds
+  guests       Int
+  contactName  String
+  contactPhone String
+  contactEmail String
+  occasion     String
+  occasionNote String?
+  subtotal     Int
+  discount     Int           @default(0)
+  total        Int
+  paymentStatus PaymentStatus @default(PENDING)
+
+  theaterId String
+  theater   Theater @relation(fields: [theaterId], references: [id])
+
+  slots Slot[]
+
+  couponCode String?
+  coupon     Coupon? @relation(fields: [couponCode], references: [code])
+
+  cart CartItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([theaterId])
+  @@index([contactEmail])
+}
+
+model CartItem {
+  id         String  @id @default(cuid())
+  bookingId  String
+  booking    Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  addOnId    String
+  addOn      AddOn   @relation(fields: [addOnId], references: [id])
+  optionName String
+  price      Int // snapshot of the option price at booking time
+  quantity   Int
+
+  @@index([bookingId])
+}
+
+model WaitlistEntry {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  city      String
+  createdAt DateTime @default(now())
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
+}

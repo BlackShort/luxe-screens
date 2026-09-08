@@ -12,8 +12,13 @@ export function applyCoupon(subtotal: number, coupon: Coupon | undefined) {
   return { discount, total: Math.max(subtotal - discount, 0) };
 }
 
-export function computeTotal(basePrice: number, cart: CartItem[], coupon?: Coupon) {
-  const subtotal = basePrice + cartSubtotal(cart);
+export function computeTotal(
+  basePrice: number,
+  durationSlots: number,
+  cart: CartItem[],
+  coupon?: Coupon
+) {
+  const subtotal = basePrice * durationSlots + cartSubtotal(cart);
   const { discount, total } = applyCoupon(subtotal, coupon);
   return { subtotal, discount, total };
 }

@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { theaters } from "@/data/theaters";
+import { useTheaters } from "@/hooks/api/use-theaters";
 import { cn } from "@/lib/utils";
 
 type Step = "occasion" | "guests" | "budget" | "result";
@@ -60,6 +60,8 @@ export function HeroAIChat({
 }: {
     onClose: () => void;
 }) {
+    const { theaters, loading } = useTheaters();
+
     const [step, setStep] = useState<Step>("occasion");
 
     const [occasion, setOccasion] = useState("");
@@ -138,9 +140,8 @@ export function HeroAIChat({
         }, 250);
     };
 
-
     const recommendation = useMemo(() => {
-        if (!guests || !budget) return null;
+        if (!guests || !budget || theaters.length === 0) return null;
 
         const sorted = [...theaters]
             .filter((theater) => theater.maxCapacity >= guests)
@@ -159,8 +160,7 @@ export function HeroAIChat({
                     name: "Birthday Celebration",
                     description: "Cake + cinematic birthday decor",
                 }
-                : occasion === "Anniversary" ||
-                    occasion === "Proposal"
+                : occasion === "Anniversary" || occasion === "Proposal"
                     ? {
                         name: "Romantic Celebration",
                         description: "Decor + celebration gift",
@@ -174,7 +174,7 @@ export function HeroAIChat({
             theatre,
             addOn,
         };
-    }, [occasion, guests, budget]);
+    }, [occasion, guests, budget, theaters]);
 
     const sendCustomMessage = () => {
         const message = customMessage.trim();
@@ -377,67 +377,77 @@ export function HeroAIChat({
                 )}
 
                 {/* Recommendation */}
-                {step === "result" && recommendation && (
-                    <div className="animate-fade-up space-y-3">
-                        <div className="rounded-xl border border-primary/30 bg-primary/10 p-3.5">
-                            <div className="mb-2 flex items-center gap-2">
-                                <div className="flex size-7 items-center justify-center rounded-full bg-primary">
-                                    <Check className="size-3.5 text-primary-foreground" />
+                {step === "result" && (
+                    loading ? (
+                        <div className="py-6 text-center text-xs text-white/50">
+                            Finding the perfect theatre...
+                        </div>
+                    ) : recommendation ? (
+                        <div className="animate-fade-up space-y-3">
+                            <div className="rounded-xl border border-primary/30 bg-primary/10 p-3.5">
+                                <div className="mb-2 flex items-center gap-2">
+                                    <div className="flex size-7 items-center justify-center rounded-full bg-primary">
+                                        <Check className="size-3.5 text-primary-foreground" />
+                                    </div>
+
+                                    <div>
+                                        <p className="text-[0.65rem] uppercase tracking-[0.14em] text-gold-soft">
+                                            My recommendation
+                                        </p>
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <p className="text-[0.65rem] uppercase tracking-[0.14em] text-gold-soft">
-                                        My recommendation
-                                    </p>
-                                </div>
+                                <h3 className="font-serif text-lg text-white">
+                                    {recommendation.theatre.name}
+                                </h3>
+
+                                <p className="mt-1 text-[0.7rem] leading-5 text-white/55">
+                                    A great fit for your {occasion?.toLowerCase()}{" "}
+                                    with {guests}{" "}
+                                    {guests === 1 ? "guest" : "guests"}.
+                                </p>
                             </div>
 
-                            <h3 className="font-serif text-lg text-white">
-                                {recommendation.theatre.name}
-                            </h3>
+                            <div className="rounded-xl border border-white/10 bg-white/5 p-3.5">
+                                <p className="text-[0.6rem] uppercase tracking-[0.15em] text-white/40">
+                                    Suggested add-on
+                                </p>
 
-                            <p className="mt-1 text-[0.7rem] leading-5 text-white/55">
-                                A great fit for your {occasion?.toLowerCase()}{" "}
-                                with {guests}{" "}
-                                {guests === 1 ? "guest" : "guests"}.
-                            </p>
+                                <p className="mt-1 text-sm font-medium text-white">
+                                    {recommendation.addOn.name}
+                                </p>
+
+                                <p className="mt-1 text-[0.7rem] text-white/50">
+                                    {recommendation.addOn.description}
+                                </p>
+                            </div>
+
+                            <Button
+                                type="button"
+                                className="h-10 w-full rounded-xl bg-primary text-xs text-primary-foreground hover:bg-primary"
+                                onClick={() => {
+                                    // todo: Connect with booking flow.
+                                    // We can pass the recommended theatre here.
+                                }}
+                            >
+                                Start this booking
+                                <ArrowRight className="ml-1 size-3.5" />
+                            </Button>
+
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                className="flex w-full items-center justify-center gap-1 text-[0.65rem] text-white/40 transition hover:text-white/70"
+                            >
+                                <ArrowLeft className="size-3" />
+                                Back to standard booking
+                            </button>
                         </div>
-
-                        <div className="rounded-xl border border-white/10 bg-white/5 p-3.5">
-                            <p className="text-[0.6rem] uppercase tracking-[0.15em] text-white/40">
-                                Suggested add-on
-                            </p>
-
-                            <p className="mt-1 text-sm font-medium text-white">
-                                {recommendation.addOn.name}
-                            </p>
-
-                            <p className="mt-1 text-[0.7rem] text-white/50">
-                                {recommendation.addOn.description}
-                            </p>
+                    ) : (
+                        <div className="py-6 text-center text-xs text-white/50">
+                            Sorry, I couldn&apos;t find a theatre matching your requirements.
                         </div>
-
-                        <Button
-                            type="button"
-                            className="h-10 w-full rounded-xl bg-primary text-xs text-primary-foreground hover:bg-primary"
-                            onClick={() => {
-                                // todo: Connect with booking flow.
-                                // We can pass the recommended theatre here.
-                            }}
-                        >
-                            Start this booking
-                            <ArrowRight className="ml-1 size-3.5" />
-                        </Button>
-
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="flex w-full items-center justify-center gap-1 text-[0.65rem] text-white/40 transition hover:text-white/70"
-                        >
-                            <ArrowLeft className="size-3" />
-                            Back to standard booking
-                        </button>
-                    </div>
+                    )
                 )}
             </div>
 
