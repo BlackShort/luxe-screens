@@ -39,10 +39,5 @@ yarn-error.log*
 *.tsbuildinfo
 
 /src/generated/prisma
-
-
-src/app/ai-planner
-src/app/gallery
-src/app/waitlist
 /docs
 .vscode
