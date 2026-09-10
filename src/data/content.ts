@@ -1,4 +1,4 @@
-import type { FaqItem, ServiceItem, Testimonial, City } from "@/types";
+import type { FaqItem, ServiceItem, Testimonial, City, Slide } from "@/types";
 import {
   ahemdabad,
   bengaluru,
@@ -150,5 +150,28 @@ export const testimonials: Testimonial[] = [
     quote: "Used Orchid Private Cinema for a 10-person product rehearsal. Better than any conference room I've rented.",
     occasion: "Seminar",
     rating: 4,
+  },
+];
+
+export const slides: Slide[] = [
+  {
+    eyebrow: "PRIVATE SCREENING",
+    title: "Cinema, Reimagined.",
+    description: "An elevated private theatre experience designed around you.",
+  },
+  {
+    eyebrow: "PREMIUM EXPERIENCES",
+    title: "Every Moment, Unforgettable.",
+    description: "Experience the magic of cinema in extraordinary surroundings.",
+  },
+  {
+    eyebrow: "LUXURY THEATRES",
+    title: "Your Screen. Your Space.",
+    description: "Private viewing, exceptional comfort, and complete privacy.",
+  },
+  {
+    eyebrow: "LUXE SCREENS",
+    title: "Where Stories Come Alive.",
+    description: "A cinematic experience crafted for the moments that matter.",
   },
 ];
