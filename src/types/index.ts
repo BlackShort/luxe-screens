@@ -154,6 +154,12 @@ export interface Testimonial {
   rating: number;
 }
 
+export interface Slide {
+  eyebrow: string;
+  title: string;
+  description: string;
+}
+
 export interface WaitlistEntry {
   name: string;
   email: string;

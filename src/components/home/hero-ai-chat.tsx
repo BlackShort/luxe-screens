@@ -12,6 +12,7 @@ import {
     Sparkles,
     Users,
     Wallet,
+    X,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -246,7 +247,7 @@ export function HeroAIChat({
                     className="flex size-8 items-center justify-center rounded-full text-white/50 transition hover:bg-white/10 hover:text-white"
                     aria-label="Back to booking"
                 >
-                    <ArrowLeft className="size-4" />
+                    <X className="size-4" />
                 </button>
             </div>
 

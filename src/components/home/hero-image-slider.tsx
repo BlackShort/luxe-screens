@@ -1,115 +1,134 @@
 "use client";
 
+import Image, { StaticImageData } from "next/image";
 import { useState, useEffect, useCallback, useRef } from "react";
-import Image from "next/image";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { ImageSource } from "@/types";
+import { slides } from "@/data/content";
 
-interface AnimatedImageSliderProps {
-    images: ImageSource[];
-    className?: string;
+interface SliderProps {
+    images: StaticImageData[];
 }
 
-export const ImageSlider = ({ images, className = "" }: AnimatedImageSliderProps) => {
+export const ImageSlider = ({ images }: SliderProps) => {
     const [currentIndex, setCurrentIndex] = useState(0);
-    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     const preloadImages = useCallback(() => {
-        images.forEach((imageSource) => {
-            if (imageSource.isStatic) return;
-
+        images.forEach((image) => {
             const img = new window.Image();
-            img.src = imageSource.src as string;
+            img.src = image.src;
         });
     }, [images]);
 
     const setupInterval = useCallback(() => {
-        if (intervalRef.current) clearInterval(intervalRef.current);
-
-        if (images.length <= 1) return;
-
-        intervalRef.current = setInterval(() => {
-            setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-        }, 4000); // Slightly faster transitions
-    }, [images.length]);
-
-    // Immediate setup for faster initial render
-    useEffect(() => {
-        setupInterval();
-        // Start preloading immediately but don't block render
-        if (typeof requestIdleCallback !== "undefined") {
-            requestIdleCallback(preloadImages);
-        } else {
-            setTimeout(preloadImages, 0);
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
         }
 
+        if (images.length <= 1) {
+            return;
+        }
+
+        intervalRef.current = setInterval(() => {
+            setCurrentIndex((prev) => (prev + 1) % images.length);
+        }, 5500);
+    }, [images.length]);
+
+    useEffect(() => {
+        setupInterval();
+        preloadImages();
+
         return () => {
-            if (intervalRef.current) clearInterval(intervalRef.current);
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
         };
     }, [setupInterval, preloadImages]);
 
-    const handleIndicatorClick = useCallback((index: number) => {
-        setCurrentIndex(index);
-    }, []);
+    // const handleIndicatorClick = useCallback(
+    //     (index: number) => {
+    //         setCurrentIndex(index);
+    //         setupInterval();
+    //     },
+    //     [setupInterval]
+    // );
+
+    if (!images.length) {
+        return null;
+    }
+
+    const activeContent = slides[currentIndex % slides.length];
 
     return (
-        <div className={`relative overflow-hidden z-10 ${className}`}>
-            <div className="absolute inset-0 w-full h-full">
-                {images.map((imageSource: ImageSource, index: number) => {
-                    const isActive = index === currentIndex;
+        <div className="relative aspect-video w-full overflow-hidden rounded-2xl sm:aspect-16/8 md:aspect-16/7">
+            {/* Images */}
+            {images.map((image, index) => (
+                <div
+                    key={index}
+                    className={`absolute inset-0 transition-opacity duration-1800 ease-in-out ${currentIndex === index
+                        ? "z-1 opacity-100"
+                        : "z-0 opacity-0"
+                        }`}
+                >
+                    <Image
+                        src={image}
+                        alt={`Luxe Screens experience ${index + 1}`}
+                        fill
+                        priority={index === 0}
+                        placeholder="blur"
+                        sizes="(max-width: 768px) 100vw, 1280px"
+                        className="object-cover"
+                    />
+                </div>
+            ))}
 
-                    return (
-                        <div
-                            key={`${typeof imageSource.src === "string" ? imageSource.src : "static"}-${index}`}
-                            className={`absolute inset-0 w-full h-full transition-all duration-700 ease-out ${isActive ? "opacity-100 z-10" : "opacity-0 z-0"
-                                }`}
-                        >
-                            <AspectRatio ratio={16 / 9}>
-                                <Image
-                                    src={imageSource.src || "/placeholder.svg"}
-                                    alt={`Sacred mountain landscape ${index + 1}`}
-                                    fill
-                                    sizes="100vw"
-                                    className={`object-cover w-full h-full transition-transform duration-500 ${isActive ? "scale-100" : "scale-105"
-                                        }`}
-                                    loading={imageSource.priority ? "eager" : "lazy"}
-                                    priority={imageSource.priority}
-                                    quality={imageSource.priority ? 95 : 80}
-                                    placeholder={imageSource.isStatic ? "blur" : "empty"}
-                                    {...(imageSource.isStatic && {
-                                        blurDataURL:
-                                            "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=",
-                                    })}
-                                />
-                            </AspectRatio>
-                        </div>
-                    );
-                })}
+            {/* Cinematic overlay */}
+            <div className="pointer-events-none absolute inset-0 z-5 bg-linear-to-r from-black/60 via-black/25 to-transparent" />
+
+            {/* Bottom subtle linear */}
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-5 h-40 bg-linear-to-t from-black/30 to-transparent" />
+
+            {/* Slide Content */}
+            <div
+                key={currentIndex}
+                className="pointer-events-none absolute inset-x-0 top-5 md:top-14 xl:top-20 left-5 sm:left-10 md:left-18 xl:left-28 z-10 flex items-start md:inset-y-0 lg:right-auto"
+            >
+                <div className="max-w-[85%] sm:max-w-xl">
+                    <p className="hero-text-eyebrow mb-2 text-[9px] font-semibold uppercase tracking-[0.25em] text-white/75 sm:mb-3 sm:text-[10px] sm:tracking-[0.3em] md:text-xs">
+                        {activeContent.eyebrow}
+                    </p>
+
+                    <h2 className="hero-text-title max-w-[320px] font-serif text-[28px] leading-[1.02] tracking-tight text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.45)] sm:max-w-xl sm:text-5xl lg:text-6xl xl:text-7xl">
+                        {activeContent.title}
+                    </h2>
+
+                    <p className="hero-text-description mt-2.5 max-w-70 text-[11px] leading-[1.45] text-white/75 drop-shadow-md sm:mt-4 sm:max-w-md sm:text-sm md:text-base">
+                        {activeContent.description}
+                    </p>
+                </div>
             </div>
 
-            {/* Overlay gradient — warm, cinematic, never flat black */}
-            <div className="absolute inset-0 z-10 bg-linear-to-b from-[#17140f]/75 via-[#17140f]/35 to-[#17140f]/85" />
-            <div className="absolute inset-0 z-10 bg-linear-to-t from-[#17140f]/90 via-transparent to-transparent" />
-            <div className="grain-overlay z-10" />
+            {/* Indicators */}
+            {/* {images.length > 1 && (
+                <div className="absolute bottom-2 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2">
+                    {images.map((_, index) => {
+                        const isActive = currentIndex === index;
 
-            {/* Optimized indicators */}
-            {images.length > 1 && (
-                <div className="absolute bottom-2 md:bottom-4 left-1/2 transform -translate-x-1/2 z-20">
-                    <div className="flex space-x-1.5 bg-black/20 backdrop-blur-sm rounded-full p-1.5">
-                        {images.map((_: ImageSource, index: number) => (
+                        return (
                             <button
                                 key={index}
+                                type="button"
+                                aria-label={`Go to slide ${index + 1}`}
+                                aria-current={isActive}
                                 onClick={() => handleIndicatorClick(index)}
-                                className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${index === currentIndex
-                                    ? "bg-white scale-125"
-                                    : "bg-white/40 hover:bg-white/60"
+                                className={`h-1.5 rounded-full transition-all duration-500 ease-out sm:h-2 ${isActive
+                                    ? "w-8 bg-white sm:w-10"
+                                    : "w-1.5 bg-white/40 hover:w-3 hover:bg-white/75 sm:w-2"
                                     }`}
-                                aria-label={`View image ${index + 1}`}
                             />
-                        ))}
-                    </div>
+                        );
+                    })}
                 </div>
-            )}
+            )} */}
         </div>
     );
-};
+}

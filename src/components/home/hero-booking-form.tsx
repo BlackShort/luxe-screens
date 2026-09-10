@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { Field } from "@/components/ui/field";
 import {
     Select,
     SelectContent,
@@ -13,7 +14,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label"
+import { Label } from "@/components/ui/label";
 import {
     Popover,
     PopoverContent,
@@ -27,7 +28,9 @@ import { cn } from "@/lib/utils";
 import { useTheaters } from "@/hooks/api/use-theaters";
 import { BOOKING_WINDOW_DAYS } from "@/lib/booking-config";
 
-const glassFieldClass = "h-10! w-full rounded-xl border-white/15! bg-white/10! px-3 text-white! backdrop-blur-md hover:bg-white/12! hover:text-white! focus-visible:border-primary! focus-visible:ring-primary/30! disabled:cursor-not-allowed! disabled:opacity-40! disabled:border-white/10! disabled:bg-white/5! data-placeholder:text-white/60! [&_svg]:text-white/70!";
+// const glassFieldClass = "h-10! w-full rounded-xl border-white/15! bg-white/10! px-3 text-white! backdrop-blur-md hover:bg-white/12! hover:text-white! focus-visible:border-primary! focus-visible:ring-primary/30! disabled:cursor-not-allowed! disabled:opacity-40! disabled:border-white/10! disabled:bg-white/5! data-placeholder:text-white/60! [&_svg]:text-white/70!";
+
+const glassFieldClass = "h-12! w-full rounded-xl border-white/15! bg-white/7! px-3 text-white! shadow-none backdrop-blur-md transition-all duration-300 hover:border-white/25! hover:bg-white/12! focus-visible:border-white/40! focus-visible:ring-2! focus-visible:ring-white/10! disabled:cursor-not-allowed! disabled:border-white/10! disabled:bg-white/4! disabled:opacity-40! data-placeholder:text-white/55! [&_svg]:text-white/65!";
 
 export function HeroBookingForm() {
     const router = useRouter();
@@ -40,9 +43,7 @@ export function HeroBookingForm() {
     const availableTheaters = useMemo(() => {
         if (!city) return [];
 
-        return theaters.filter(
-            (theater) => theater.city === city
-        );
+        return theaters.filter((theater) => theater.city === city);
     }, [city, theaters]);
 
     const today = useMemo(() => {
@@ -67,48 +68,45 @@ export function HeroBookingForm() {
 
         const params = new URLSearchParams({
             city,
-            theater: theater?.id,
+            theater: theater.id,
             date: format(date, "yyyy-MM-dd"),
         });
 
         router.push(`/booking?${params.toString()}`);
     }
 
+    const isComplete = Boolean(city && theater && date);
+
     return (
-        <div className="animate-[booking-fade_0.7s_ease-out_0.52s_both] w-full max-w-90 rounded-2xl border border-white/20 bg-[#17140f]/35 p-4 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.8)] backdrop-blur-2xl backdrop-saturate-150 sm:p-5">
-            <div className="mb-4">
-                <p className="text-[0.65rem] font-medium uppercase tracking-[0.22em] text-gold-soft">
-                    Start your booking
-                </p>
-
-                <h2 className="mt-1.5 font-serif text-xl leading-tight text-white lg:text-[1.7rem]">
-                    Plan your private
-                    <br className="hidden lg:block"/>
-                    <span> screening</span>
-                </h2>
-
-                <p className="lg:mt-1.5 text-xs leading-5 text-white/60">
-                    Choose your location and date to get started.
-                </p>
-            </div>
-
-            <div className="space-y-2 lg:space-y-3">
-                <div>
-                    <Label className="mb-2 block text-xs font-medium text-white/80">
+        <form
+            onSubmit={(event) => {
+                event.preventDefault();
+                handleContinue();
+            }}
+            className="w-full rounded-2xl border border-white/15 bg-[#17140f]/65! p-2 shadow-md md:shadow-[0_30px_100px_-30px_rgba(0,0,0,0.8)] backdrop-blur-2xl backdrop-saturate-150 sm:p-2.5 lg:p-3"
+        >
+            <div className="flex flex-col gap-1.5 md:flex-row md:items-end md:gap-2">
+                {/* City */}
+                <Field className="min-w-0 flex-1 px-1.5 py-1.5">
+                    <Label className="mb-2 block pl-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white">
                         City
                     </Label>
 
                     <Select
                         value={city}
-                        onValueChange={(value) =>
-                            handleCityChange(value ?? "")
-                        }
+                        onValueChange={(value) => handleCityChange(value ?? "")}
                     >
                         <SelectTrigger
                             size="default"
                             className={glassFieldClass}
                         >
-                            <MapPin aria-hidden="true" className="shrink-0" />
+                            <span className="mr-1.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-white/7">
+                                <MapPin
+                                    aria-hidden="true"
+                                    className="size-3.5!"
+                                />
+                            </span>
+
                             <SelectValue placeholder="Select city" />
                         </SelectTrigger>
 
@@ -126,11 +124,14 @@ export function HeroBookingForm() {
                             ))}
                         </SelectContent>
                     </Select>
-                </div>
+                </Field>
+
+                {/* Divider */}
+                <div className="hidden mb-2.5 h-10 w-px bg-white/10 lg:block" />
 
                 {/* Theatre */}
-                <div>
-                    <Label className="mb-2 block text-xs font-medium text-white/80">
+                <Field className="min-w-0 flex-1 px-1.5 py-1.5">
+                    <Label className="mb-2 block pl-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white">
                         Theatre
                     </Label>
 
@@ -138,7 +139,9 @@ export function HeroBookingForm() {
                         value={theater?.id ?? ""}
                         onValueChange={(value) => {
                             const selectedTheater =
-                                availableTheaters.find((t) => t.id === value) ?? null;
+                                availableTheaters.find(
+                                    (item) => item.id === value
+                                ) ?? null;
 
                             setTheater(selectedTheater);
                         }}
@@ -148,7 +151,13 @@ export function HeroBookingForm() {
                             size="default"
                             className={glassFieldClass}
                         >
-                            <MapPinHouse aria-hidden="true" className="shrink-0" />
+                            <span className="mr-1.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-white/7">
+                                <MapPinHouse
+                                    aria-hidden="true"
+                                    className="size-3.5!"
+                                />
+                            </span>
+
                             <SelectValue
                                 placeholder={
                                     !city
@@ -166,21 +175,24 @@ export function HeroBookingForm() {
                             alignItemWithTrigger={false}
                             align="start"
                         >
-                            {availableTheaters.map((theater) => (
+                            {availableTheaters.map((item) => (
                                 <SelectItem
-                                    key={theater.id}
-                                    value={theater.id}
+                                    key={item.id}
+                                    value={item.id}
                                 >
-                                    {theater.name}
+                                    {item.name}
                                 </SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
-                </div>
+                </Field>
+
+                {/* Divider */}
+                <div className="hidden mb-2.5 h-10 w-px bg-white/10 lg:block" />
 
                 {/* Date */}
-                <div>
-                    <Label className="mb-2 block text-xs font-medium text-white/80">
+                <Field className="min-w-0 flex-1 px-1.5 py-1.5">
+                    <Label className="mb-2 block pl-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white">
                         Date
                     </Label>
 
@@ -193,18 +205,27 @@ export function HeroBookingForm() {
                                     data-empty={!date}
                                     className={cn(
                                         glassFieldClass,
-                                        "justify-start text-left font-normal data-[empty=true]:text-white/60!"
+                                        "justify-start text-left font-normal data-[empty=true]:text-white/55!"
                                     )}
                                 >
-                                    <CalendarDays aria-hidden="true" className="shrink-0" />
+                                    <span className="mr-1.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-white/7">
+                                        <CalendarDays
+                                            aria-hidden="true"
+                                            className="size-3.5!"
+                                        />
+                                    </span>
 
-                                    {date ? format(date, "PPP") : <span>Select a date</span>}
+                                    {date ? (
+                                        format(date, "PPP")
+                                    ) : (
+                                        <span>Select a date</span>
+                                    )}
                                 </Button>
                             }
                         />
 
                         <PopoverContent
-                            className="w-auto p-0"
+                            className="w-auto rounded-xl border-border/50 p-0 shadow-xl"
                             align="start"
                         >
                             <Calendar
@@ -212,33 +233,37 @@ export function HeroBookingForm() {
                                 selected={date}
                                 onSelect={setDate}
                                 defaultMonth={date ?? today}
-                                disabled={{ before: today, after: maxDate }}
+                                disabled={{
+                                    before: today,
+                                    after: maxDate,
+                                }}
                             />
                         </PopoverContent>
                     </Popover>
+                </Field>
+
+                {/* Action */}
+                <div className="p-1.5">
+                    <Button
+                        type="submit"
+                        size="lg"
+                        disabled={!isComplete}
+                        className="cursor-pointer group btn-shine h-12 w-full rounded-xl bg-primary px-6 text-sm font-medium text-primary-foreground shadow-[0_8px_24px_-8px_rgba(0,0,0,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary hover:shadow-[0_12px_30px_-8px_rgba(0,0,0,0.6)] disabled:pointer-events-none disabled:opacity-40 lg:w-auto"
+                    >
+                        <span>
+                            {isComplete ? "Continue" : "Book Now"}
+                        </span>
+
+                        {isComplete && (
+                            <ArrowRight
+                                size={16}
+                                aria-hidden="true"
+                                className="transition-transform duration-300 group-hover:translate-x-1"
+                            />
+                        )}
+                    </Button>
                 </div>
-
-                {/* Continue */}
-                <Button
-                    type="button"
-                    size="lg"
-                    disabled={!city || !theater || !date}
-                    onClick={handleContinue}
-                    className="btn-shine mt-2 h-11 w-full rounded-xl bg-primary text-sm font-medium text-primary-foreground transition-transform duration-300 hover:scale-[1.02] hover:bg-primary disabled:pointer-events-none disabled:opacity-50"
-                >
-                    Continue
-
-                    <ArrowRight
-                        size={16}
-                        aria-hidden="true"
-                    />
-                </Button>
             </div>
-
-            {/* Footer note */}
-            <p className="mt-4 text-center text-[0.7rem] text-white/45">
-                You can add guests, occasions and extras next.
-            </p>
-        </div>
+        </form>
     );
 }

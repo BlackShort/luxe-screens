@@ -3,6 +3,11 @@ import logo from "@/assets/logo/logo-light.png";
 import banner1 from "@/assets/banners/image1.jpg";
 import banner2 from "@/assets/banners/image2.jpg";
 import banner3 from "@/assets/banners/image3.png";
+import banner4 from "@/assets/banners/image4.jpg";
+import banner5 from "@/assets/banners/image5.jpg";
+import banner6 from "@/assets/banners/image6.jpg";
+import banner7 from "@/assets/banners/image7.jpg";
+import banner8 from "@/assets/banners/image8.jpg";
 
 import TwitterIcon from "@/assets/svgs/twitter.svg";
 import InstagramIcon from "@/assets/svgs/instagram.svg";
@@ -26,6 +31,11 @@ export {
     banner1,
     banner2,
     banner3,
+    banner4,
+    banner5,
+    banner6,
+    banner7,
+    banner8,
     FacebookIcon,
     InstagramIcon,
     TwitterIcon,
