@@ -165,7 +165,7 @@ export default function AiPlannerPage() {
                         onClick={() => setOccasion(item.type)}
                         className={cn(
                           `
-                        group relative flex min-h-[52px]
+                        group relative flex min-h-13
                         items-center gap-2.5
                         rounded-xl border px-3
                         text-left text-sm
@@ -186,7 +186,7 @@ export default function AiPlannerPage() {
                           bg-background
                           text-muted-foreground
                           hover:border-primary/40
-                          hover:bg-primary/[0.03]
+                          hover:bg-primary/3
                           hover:text-foreground
                         `
                         )}
@@ -423,12 +423,12 @@ export default function AiPlannerPage() {
             {result === null ? (
               <div
                 className="
-              flex min-h-[420px]
+              flex min-h-105
               items-center justify-center
               rounded-2xl
               border border-dashed
               border-border
-              bg-muted/[0.18]
+              bg-muted/18
               px-6 py-12
               sm:px-10
             "
@@ -479,7 +479,7 @@ export default function AiPlannerPage() {
             {result === "empty" ? (
               <div
                 className="
-              flex min-h-[420px]
+              flex min-h-105
               items-center justify-center
               rounded-2xl
               border border-border
@@ -611,7 +611,7 @@ export default function AiPlannerPage() {
                 <div
                   className="
                 border-t border-border
-                bg-muted/[0.18]
+                bg-muted/18
                 p-5
                 sm:px-7 sm:py-5
               "

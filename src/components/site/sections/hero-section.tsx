@@ -18,7 +18,7 @@ export const HeroSection = () => {
     const images = useMemo(() => [banner4, banner6, banner7, banner8], []);
 
     return (
-        <section className="relative w-full px-2 pt-6 md:p-6">
+        <section className="relative w-full px-2 pt-6 md:pt-6 md:pb-8 md:px-10">
             <ImageSlider images={images} />
 
             <Reveal
@@ -32,14 +32,14 @@ export const HeroSection = () => {
                 </h2>
             </Reveal>
 
-            <div className="relative bottom-0 md:absolute inset-x-0 sm:-bottom-12 lg:bottom-12 z-20 mx-auto w-full max-w-2xl md:max-w-3xl lg:max-w-4xl xl:max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="relative bottom-0 md:absolute inset-x-0 sm:-bottom-12 -lg:bottom-1 z-20 mx-auto w-full max-w-2xl md:max-w-3xl lg:max-w-4xl xl:max-w-6xl px-4 sm:px-6 lg:px-8">
                 <HeroBookingForm />
             </div>
 
             <div
                 className={"flex justify-center lg:justify-self-end fixed inset-x-4 bottom-24 z-30 sm:inset-x-auto sm:right-6 sm:bottom-24 lg:right-25 lg:bottom-14 lg:w-auto"}
             >
-                <div className="animate-fade-up opacity-0 [animation-delay:700ms] relative w-full max-w-90">
+                <div className="relative w-full max-w-90">
                     {showAI && (
                         <HeroAIChat onClose={() => setShowAI((prev) => !prev)} />
                     )}

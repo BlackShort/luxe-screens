@@ -77,6 +77,7 @@ export function Header({ variant = "fixed" }: HeaderProps) {
     };
 
     const isScrolled = scrollProgress > 0.5;
+    const isMobileScrolled = viewportWidth < 640 && isScrolled;
     const isLightHeader = variant === "sticky" || variant === "static" || isScrolled;
     const headerPosition = variant === "static" ? "relative" : variant === "sticky" ? "sticky" : "fixed";
 
@@ -110,7 +111,7 @@ export function Header({ variant = "fixed" }: HeaderProps) {
                         sizes="192px"
                     />
 
-                    <h1 className={`ml-1 font-serif text-base font-medium tracking-tight transition-colors duration-300 sm:ml-2 md:text-lg lg:text-xl ${isLightHeader ? "text-foreground" : "text-white/90 drop-shadow-md"}`}>
+                    <h1 className={`ml-1 font-serif text-base font-medium tracking-tight transition-colors duration-300 sm:ml-2 md:text-lg lg:text-xl ${isLightHeader ? "text-foreground" : "text-white/90 drop-shadow-md"} ${isMobileScrolled ? "hidden" : "block"}`}>
                         Luxe Screens
                     </h1>
                 </Link>
@@ -188,7 +189,7 @@ export function Header({ variant = "fixed" }: HeaderProps) {
                     <Link href="/booking" className="lg:hidden">
                         <Button
                             size="sm"
-                            className={`cursor-pointer btn-shine h-8 rounded-full px-3 text-xs font-medium transition-all will-change-transform duration-300 active:scale-95 sm:h-9 sm:px-4 sm:text-sm ${isLightHeader ? "bg-primary text-primary-foreground shadow-sm" : "bg-white/90 text-foreground shadow-lg backdrop-blur-sm hover:bg-white"}`}
+                            className={`cursor-pointer btn-shine h-8 rounded-full px-4 text-xs font-medium transition-all will-change-transform duration-300 active:scale-95 sm:h-9 sm:px-4 sm:text-sm ${isLightHeader ? "bg-primary text-primary-foreground shadow-sm" : "bg-white/90 text-foreground shadow-lg backdrop-blur-sm hover:bg-white"}`}
                         >
                             Book
                         </Button>

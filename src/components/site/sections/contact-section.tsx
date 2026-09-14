@@ -100,9 +100,9 @@ export function Contact() {
                 </h1>
             </Reveal>
 
-            <Reveal delay={120} className="mx-auto grid w-full max-w-6xl overflow-hidden rounded-2xl border border-border bg-card shadow-[0_1px_2px_rgba(23,20,15,0.04),0_24px_60px_-30px_rgba(23,20,15,0.18)] md:grid-cols-2">
+            <Reveal delay={120} className="mx-auto flex items-center justify-around gap-4 flex-col md:flex-row w-full max-w-6xl overflow-hidden">
                 {/* Image */}
-                <div className="relative min-h-72 md:min-h-full">
+                <div className="w-full max-w-2xl relative aspect-4/3 rounded-2xl border border-border bg-card shadow-[0_1px_2px_rgba(23,20,15,0.04),0_24px_60px_-30px_rgba(23,20,15,0.18)] md:max-h-96 overflow-hidden">
                     <Image
                         src="https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c"
                         alt="Private theatre interior"
@@ -114,7 +114,7 @@ export function Contact() {
                 </div>
 
                 {/* Content */}
-                <div className="pt-10 px-6 pb-4 sm:px-10">
+                <div className="w-full max-w-sm rounded-2xl border border-border bg-card shadow-[0_1px_2px_rgba(23,20,15,0.04),0_24px_60px_-30px_rgba(23,20,15,0.18)] py-6 px-6">
                     <div className="mb-8">
                         <h2 className="font-serif text-2xl font-normal tracking-tight">
                             Write to us
@@ -208,26 +208,28 @@ export function Contact() {
                         <Button
                             type="submit"
                             disabled={isSubmitting}
-                            className="btn-shine w-full rounded-full bg-primary text-primary-foreground hover:bg-primary"
+                            className="mt-auto btn-shine w-full rounded-full bg-primary text-primary-foreground hover:bg-primary"
                         >
                             {isSubmitting
                                 ? "Sending..."
                                 : "Send message"}
                         </Button>
 
-                        <div aria-live="polite">
-                            {status === "sent" && (
-                                <p className="text-sm text-success">
-                                    Thanks — we&apos;ll reply within a day.
-                                </p>
-                            )}
+                        {(status == "sent" || status == "error") && (
+                            <div aria-live="polite" className="mt-2 min-h-5 text-center hidden">
+                                {status === "sent" && (
+                                    <p className="text-sm text-success">
+                                        Thanks — we&apos;ll reply within a day.
+                                    </p>
+                                )}
 
-                            {status === "error" && (
-                                <p className="text-sm text-destructive">
-                                    Something went wrong. Please try again.
-                                </p>
-                            )}
-                        </div>
+                                {status === "error" && (
+                                    <p className="text-sm text-destructive">
+                                        Something went wrong. Please try again.
+                                    </p>
+                                )}
+                            </div>
+                        )}
                     </form>
                 </div>
             </Reveal>

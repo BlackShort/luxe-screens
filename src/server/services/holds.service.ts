@@ -43,9 +43,6 @@ export async function createHold(
   const holdExpiresAt = new Date(Date.now() + HOLD_DURATION_MINUTES * 60_000);
 
   const result = await prisma.$transaction(async (tx) => {
-    // Reclaim any expired holds sitting on exactly the rows we want,
-    // before attempting to create ours — otherwise a stale HELD row would
-    // block createMany below even though it's really available again.
     await tx.slot.deleteMany({
       where: {
         theaterId,
@@ -57,12 +54,6 @@ export async function createHold(
       },
     });
 
-    // createMany + skipDuplicates instead of per-row create+catch: a
-    // failed statement aborts the whole Postgres transaction, so we can't
-    // cleanly catch a unique-constraint error mid-transaction and keep
-    // going. This way the race is resolved by the database's own unique
-    // constraint (whoever's INSERT lands first wins), and we just check
-    // the aftermath.
     await tx.slot.createMany({
       data: times.map((time) => ({
         theaterId,
@@ -83,9 +74,6 @@ export async function createHold(
       rows.length === times.length && rows.every((row) => row.holdToken === holdToken);
 
     if (!allOurs) {
-      // We lost the race for at least one slot in the run — release
-      // whatever we did manage to grab so we don't leave a partial,
-      // unusable hold sitting around for its full expiry window.
       await tx.slot.deleteMany({ where: { holdToken, bookingId: null } });
       return null;
     }
@@ -107,7 +95,6 @@ export async function createHold(
   };
 }
 
-/** Best-effort release — used when the user changes their selection or leaves the wizard. */
 export async function releaseHold(holdToken: string): Promise<void> {
   await prisma.slot.deleteMany({ where: { holdToken, bookingId: null } });
 }

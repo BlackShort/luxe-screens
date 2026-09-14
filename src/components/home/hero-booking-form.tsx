@@ -83,7 +83,7 @@ export function HeroBookingForm() {
                 event.preventDefault();
                 handleContinue();
             }}
-            className="w-full rounded-2xl border border-white/15 bg-[#17140f]/65! p-2 shadow-md md:shadow-[0_30px_100px_-30px_rgba(0,0,0,0.8)] backdrop-blur-2xl backdrop-saturate-150 sm:p-2.5 lg:p-3"
+            className="w-full rounded-2xl border border-white/15 bg-[#17140f]/65! p-2 shadow-md md:shadow-[0_30px_100px_-30px_rgba(0,0,0,0.8)] backdrop-blur-2xl backdrop-saturate-150 sm:p-2.5 lg:p-3 lg:py-4"
         >
             <div className="flex flex-col gap-1.5 md:flex-row md:items-end md:gap-2">
                 {/* City */}
@@ -251,7 +251,7 @@ export function HeroBookingForm() {
                         className="cursor-pointer group btn-shine h-12 w-full rounded-xl bg-primary px-6 text-sm font-medium text-primary-foreground shadow-[0_8px_24px_-8px_rgba(0,0,0,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary hover:shadow-[0_12px_30px_-8px_rgba(0,0,0,0.6)] disabled:pointer-events-none disabled:opacity-40 lg:w-auto"
                     >
                         <span>
-                            {isComplete ? "Continue" : "Book Now"}
+                            {isComplete ? "Continue" : "Check Availability"}
                         </span>
 
                         {isComplete && (

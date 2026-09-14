@@ -61,6 +61,7 @@ export interface Occasion {
   type: OccasionType;
   description: string;
   icon: LucideIcon;
+  image: StaticImageData;
 }
 
 export type AddOnCategory = "CAKE" | "DECORATION" | "GIFT" | "FOOD" | "DRINK" | "PROJECTOR";
@@ -155,7 +156,6 @@ export interface Testimonial {
 }
 
 export interface Slide {
-  eyebrow: string;
   title: string;
   description: string;
 }
