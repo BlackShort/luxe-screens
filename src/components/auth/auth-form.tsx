@@ -150,7 +150,8 @@ export default function AuthForm({
                     <p className="mt-1.5 text-sm text-muted-foreground">
                         {isSignup
                             ? "Enter your information to get started."
-                            : "Sign in to continue your private theatre experience."}
+                            : "Sign in to continue your private theatre experience."
+                        }
                     </p>
                 </div>
 
@@ -159,7 +160,7 @@ export default function AuthForm({
                     <button
                         type="button"
                         className="
-                            flex h-11 items-center justify-center gap-2
+                            cursor-pointer flex h-11 items-center justify-center gap-2
                             rounded-xl border border-border
                             bg-background
                             text-sm font-medium
@@ -175,7 +176,7 @@ export default function AuthForm({
                     <button
                         type="button"
                         className="
-                            flex h-11 items-center justify-center gap-2
+                            cursor-pointer flex h-11 items-center justify-center gap-2
                             rounded-xl border border-border
                             bg-background
                             text-sm font-medium

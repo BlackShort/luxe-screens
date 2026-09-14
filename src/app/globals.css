@@ -239,10 +239,6 @@
   animation: heroTextReveal 2400ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.hero-text-eyebrow {
-  animation: heroTextReveal 1800ms cubic-bezier(0.16, 1, 0.3, 1) 100ms both;
-}
-
 .hero-text-title {
   animation: heroTextReveal 2200ms cubic-bezier(0.16, 1, 0.3, 1) 250ms both;
 }
@@ -337,6 +333,14 @@
   height: 1px;
   width: 3rem;
   background: linear-gradient(to right, var(--primary), transparent);
+}
+
+.gallery {
+  @apply relative transition-all duration-500 ease-out;
+}
+
+.gallery:hover {
+  transform: translateY(-6px);
 }
 
 /* Premium card treatment: soft shadow, hover lift, subtle border glow */

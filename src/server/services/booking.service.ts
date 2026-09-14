@@ -26,11 +26,6 @@ export async function createBooking(data: BookingCreateInput): Promise<Booking> 
     throw new BookingError(`This room seats up to ${theater.maxCapacity} guests`, 422);
   }
 
-  // The hold already exists (created by POST /api/slots/hold when the
-  // customer picked a time) — this step verifies it's still ours and still
-  // live, then attaches the booking details. It never creates the hold
-  // itself; that's deliberate, since holding needs to happen the moment
-  // someone picks a time, not several wizard steps later at payment.
   const heldSlots = await prisma.slot.findMany({
     where: { holdToken: data.holdToken, theaterId: theater.id },
     orderBy: { time: "asc" },
@@ -68,8 +63,6 @@ export async function createBooking(data: BookingCreateInput): Promise<Booking> 
   const slotIds = heldSlots.map((slot) => slot.id);
 
   const created = await prisma.$transaction(async (tx) => {
-    // Re-check inside the transaction — the hold could theoretically have
-    // just expired between the read above and now.
     const freshSlots = await tx.slot.findMany({ where: { id: { in: slotIds } } });
     if (
       freshSlots.length !== slotIds.length ||
@@ -108,11 +101,6 @@ export async function createBooking(data: BookingCreateInput): Promise<Booking> 
       },
     });
 
-    // Attach the already-held slots to the new booking. holdExpiresAt is
-    // deliberately left in place (not cleared) — if the customer's
-    // browser dies right here and payment confirmation never happens,
-    // this PENDING booking's slots still self-release on schedule instead
-    // of being stuck HELD forever.
     await tx.slot.updateMany({
       where: { id: { in: slotIds } },
       data: { bookingId: booking.id },
@@ -135,10 +123,7 @@ export async function confirmBooking(bookingId: string): Promise<Booking | null>
   if (!existing) return null;
   if (existing.paymentStatus === "PAID") return toBookingDTO(existing);
 
-  // Simulated payment gateway: a well-formed token always succeeds here.
-  // Swap this block for a real gateway webhook/verification call later.
   const updated = await prisma.$transaction(async (tx) => {
-    // Now permanent — clear the hold expiry so it never gets reclaimed.
     await tx.slot.updateMany({
       where: { bookingId: existing.id },
       data: { status: "BOOKED", holdExpiresAt: null, holdToken: null },

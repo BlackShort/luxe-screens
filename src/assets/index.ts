@@ -25,6 +25,13 @@ import mumbai from "@/assets/cities/mumbai.png";
 import pune from "@/assets/cities/pune.png";
 import vishakhapatnam from "@/assets/cities/vishakhapatnam.png";
 
+import seminar from "@/assets/occasions/seminar.jpg";
+import anniversary from "@/assets/occasions/anniversary.jpg";
+import birthday from "@/assets/occasions/birthday.jpg";
+import engagement from "@/assets/occasions/engagement.jpg";
+import party from "@/assets/occasions/party.jpg";
+import date from "@/assets/occasions/coffe.jpg";
+
 
 export {
     logo,
@@ -49,5 +56,11 @@ export {
     lucknow,
     mumbai,
     pune,
-    vishakhapatnam
+    vishakhapatnam,
+    seminar,
+    anniversary,
+    birthday,
+    engagement,
+    party,
+    date,
 };

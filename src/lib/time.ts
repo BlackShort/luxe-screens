@@ -1,7 +1,7 @@
 // All theaters are in Indian cities, so "now" for slot cutoffs always means India Standard Time
 const IST_OFFSET_MS = (5 * 60 + 30) * 60 * 1000;
 
-/** The current instant's IST wall-clock date/time, as sortable strings. */
+// The current instant's IST wall-clock date/time, as sortable strings.
 export function istDateTimeParts(instant: Date = new Date()): {
   date: string; // "YYYY-MM-DD"
   time: string; // "HH:MM", 24-hour

@@ -4,7 +4,7 @@ import { Reveal } from "@/components/site/common/reveal";
 
 export function Presence() {
     return (
-        <section id="locations" className="py-16 sm:py-20 overflow-hidden">
+        <section id="locations" className="py-16 sm:pb-20 sm:pt-40 overflow-hidden">
             <div className="flex flex-col items-center gap-5 text-center">
                 <Reveal as="div" className="flex flex-col items-center gap-3">
                     <span className="eyebrow">Where we are</span>

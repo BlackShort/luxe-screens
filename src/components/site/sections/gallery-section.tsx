@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/site/common/reveal";
@@ -46,17 +46,25 @@ export function Gallery() {
 
                         <Link
                             href="/gallery"
-                            className="hidden items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-primary md:flex"
+                            className="group hidden items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-primary md:flex"
                         >
-                            View full gallery
-                            <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                aria-label="Gallery"
+                                size={'lg'}
+                                className={'rounded-full px-4 cursor-pointer'}
+                            >
+                                View full gallery
+                                <ArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
+                            </Button>
                         </Link>
                     </Reveal>
 
-                    <Reveal delay={120} className="card-premium overflow-hidden">
+                    <Reveal delay={120} className="gallery overflow-hidden">
                         <div className="grid md:grid-cols-2">
                             {/* Image */}
-                            <div className="relative aspect-4/3 overflow-hidden bg-muted md:aspect-auto md:min-h-105">
+                            <div className="relative aspect-4/3 overflow-hidden rounded-2xl bg-muted md:aspect-auto md:max-h-96">
                                 <Image
                                     key={theater.id}
                                     src={theater.images[0] ?? ""}
@@ -144,7 +152,7 @@ export function Gallery() {
                         variant="outline"
                         onClick={() => go(-1)}
                         aria-label="Previous room"
-                        className="size-12 rounded-full border-border bg-background/90 backdrop-blur cursor-pointer transition-all duration-300 hover:scale-105 hover:border-primary hover:text-primary"
+                        className="size-12 rounded-full border-primary/50 bg-background/90 backdrop-blur cursor-pointer transition-all duration-300 hover:scale-105 hover:border-primary hover:text-primary"
                     >
                         <ChevronLeft className="size-6" />
                     </Button>
@@ -154,7 +162,7 @@ export function Gallery() {
                         variant="outline"
                         onClick={() => go(1)}
                         aria-label="Next room"
-                        className="size-12 rounded-full border-border bg-background/90 backdrop-blur cursor-pointer transition-all duration-300 hover:scale-105 hover:border-primary hover:text-primary"
+                        className="size-12 rounded-full border-primary/50 bg-background/90 backdrop-blur cursor-pointer transition-all duration-300 hover:scale-105 hover:border-primary hover:text-primary"
                     >
                         <ChevronRight className="size-6" />
                     </Button>

@@ -93,15 +93,11 @@ export const ImageSlider = ({ images }: SliderProps) => {
                 className="pointer-events-none absolute inset-x-0 top-5 md:top-14 xl:top-20 left-5 sm:left-10 md:left-18 xl:left-28 z-10 flex items-start md:inset-y-0 lg:right-auto"
             >
                 <div className="max-w-[85%] sm:max-w-xl">
-                    <p className="hero-text-eyebrow mb-2 text-[9px] font-semibold uppercase tracking-[0.25em] text-white/75 sm:mb-3 sm:text-[10px] sm:tracking-[0.3em] md:text-xs">
-                        {activeContent.eyebrow}
-                    </p>
-
-                    <h2 className="hero-text-title max-w-[320px] font-serif text-[28px] leading-[1.02] tracking-tight text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.45)] sm:max-w-xl sm:text-5xl lg:text-6xl xl:text-7xl">
+                    <h2 className="hero-text-title max-w-xs font-serif text-[28px] leading-[1.02] tracking-tight text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.45)] sm:max-w-xl sm:text-5xl lg:text-6xl xl:text-7xl">
                         {activeContent.title}
                     </h2>
 
-                    <p className="hero-text-description mt-2.5 max-w-70 text-[11px] leading-[1.45] text-white/75 drop-shadow-md sm:mt-4 sm:max-w-md sm:text-sm md:text-base">
+                    <p className="hero-text-description mt-2.5 max-w-xs text-[11px] leading-[1.45] text-white/75 drop-shadow-md sm:mt-4 sm:max-w-md sm:text-sm md:text-base">
                         {activeContent.description}
                     </p>
                 </div>
